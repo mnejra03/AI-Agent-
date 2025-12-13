@@ -1,23 +1,31 @@
-# model_utils.py
 import joblib
 import pandas as pd
 
-MODEL_PATH = "models/rf_model.joblib"
+def load_model():
+    bundle = joblib.load("models/rf_model.joblib")
+    return bundle["model"], bundle["scaler"], bundle["features"]
 
-def load_model(path=MODEL_PATH):
-    data = joblib.load(path)
-    return data["model"], data["scaler"], data["features"]
+def predict(model, scaler, features, data: dict):
+    X = pd.DataFrame([data])
 
-def predict(model, scaler, features, input_dict):
-    X = pd.DataFrame([input_dict])
-    X = X[features]
+    # poravnaj feature-e
+    X = X.reindex(columns=features, fill_value=0)
+
     X_scaled = scaler.transform(X)
     proba = model.predict_proba(X_scaled)[0][1]
-    pred = model.predict(X_scaled)[0]
-    return {"probability": float(proba), "prediction": int(pred)}
+    pred = int(proba >= 0.5)
+
+    return {
+        "prediction": pred,
+        "probability": float(proba)
+    }
 
 def get_feature_importance(model, features):
     if hasattr(model, "feature_importances_"):
-        imp = model.feature_importances_
-        return sorted(zip(features, imp), key=lambda x: x[1], reverse=True)
+        importances = model.feature_importances_
+        return sorted(
+            zip(features, importances),
+            key=lambda x: x[1],
+            reverse=True
+        )
     return []

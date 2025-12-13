@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthPredict</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-left">
+            <h1>HealthPredict</h1>
+        </div>
+        <div class="header-right">
+            <label for="languageSelect" data-i18n="language_label">Jezik:</label>
+            <select id="languageSelect">
+                <option value="bs" selected data-i18n="bs">Bosanski</option>
+                <option value="en" data-i18n="en">English</option>
+            </select>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- PREDICT CARD -->
+        <div class="card">
+            <h2 data-i18n="predict_title">Heart Disease Prediction</h2>
+
+            <label data-i18n="age">Age</label>
+            <input type="number" id="age" placeholder="40-70">
+
+            <label data-i18n="sex">Sex</label>
+            <select id="sex">
+                <option value="" disabled selected data-i18n="select">Select</option>
+                <option value="1" data-i18n="male">Male</option>
+                <option value="0" data-i18n="female">Female</option>
+            </select>
+
+            <label data-i18n="cp">Chest Pain Type</label>
+            <select id="cp">
+                <option value="" disabled selected data-i18n="select">Select</option>
+                <option value="typical angina">typical angina</option>
+                <option value="asymptomatic">asymptomatic</option>
+                <option value="non-anginal">non-anginal</option>
+                <option value="atypical angina">atypical angina</option>
+            </select>
+
+            <label data-i18n="trestbps">Resting BP</label>
+            <input type="number" id="trestbps" placeholder="100-180">
+
+            <label data-i18n="chol">Cholesterol</label>
+            <input type="number" id="chol" placeholder="150-300">
+
+            <label data-i18n="fbs">Fasting Blood Sugar</label>
+            <select id="fbs">
+                <option value="" disabled selected data-i18n="select">Select</option>
+                <option value="1" data-i18n="yes">Yes</option>
+                <option value="0" data-i18n="no">No</option>
+            </select>
+
+            <label data-i18n="restecg">Resting ECG</label>
+            <select id="restecg">
+                <option value="" disabled selected data-i18n="select">Select</option>
+                <option value="normal" data-i18n="normal">normal</option>
+                <option value="lv hypertrophy" data-i18n="lv_hypertrophy">lv hypertrophy</option>
+                <option value="ST-T wave abnormality" data-i18n="stt">ST-T wave abnormality</option>
+            </select>
+
+            <label data-i18n="thalach">Max Heart Rate</label>
+            <input type="number" id="thalach" placeholder="70-200">
+
+            <label data-i18n="exang">Exercise Induced Angina</label>
+            <select id="exang">
+                <option value="" disabled selected data-i18n="select">Select</option>
+                <option value="1" data-i18n="yes">Yes</option>
+                <option value="0" data-i18n="no">No</option>
+            </select>
+
+            <label data-i18n="oldpeak">Oldpeak</label>
+            <input type="number" step="0.1" id="oldpeak" placeholder="0-6">
+
+            <label data-i18n="slope">Slope</label>
+            <select id="slope">
+                <option value="" disabled selected data-i18n="select">Select</option>
+                <option value="upsloping" data-i18n="upsloping">upsloping</option>
+                <option value="flat" data-i18n="flat">flat</option>
+                <option value="downsloping" data-i18n="downsloping">downsloping</option>
+            </select>
+
+            <label data-i18n="ca">CA</label>
+            <input type="number" id="ca" placeholder="0-3">
+
+            <label data-i18n="thal">Thal</label>
+            <select id="thal">
+                <option value="" disabled selected data-i18n="select">Select</option>
+                <option value="normal" data-i18n="normal">normal</option>
+                <option value="fixed defect" data-i18n="fixed_defect">fixed defect</option>
+                <option value="reversable defect" data-i18n="reversable_defect">reversable defect</option>
+            </select>
+
+            <button id="predictBtn" data-i18n="predict_btn">Predict Risk</button>
+            <div class="result" id="result"></div>
+        </div>
+
+        <!-- ADD DATA CARD -->
+        <div class="card">
+            <h2 data-i18n="add_patient_title">Dodaj Novog Pacijenta</h2>
+
+            <label data-i18n="age">Starost</label>
+            <input type="number" id="add_age" placeholder="40-70">
+
+            <label data-i18n="sex">Spol</label>
+            <select id="add_sex">
+                <option value="" disabled selected data-i18n="select">Odaberi</option>
+                <option value="1" data-i18n="male">Muški</option>
+                <option value="0" data-i18n="female">Ženski</option>
+            </select>
+
+            <label data-i18n="cp">Tip Angine (Bol u grudima)</label>
+            <select id="add_cp">
+                <option value="" disabled selected data-i18n="select">Odaberi</option>
+                <option value="typical angina">tipična angina</option>
+                <option value="asymptomatic">asimptomatska</option>
+                <option value="non-anginal">ne-anginalna</option>
+                <option value="atypical angina">atipična angina</option>
+            </select>
+
+            <label data-i18n="trestbps">Krvo Tlak u mirovanju (Resting BP)</label>
+            <input type="number" id="add_trestbps" placeholder="100-180">
+
+            <label data-i18n="chol">Holesterol</label>
+            <input type="number" id="add_chol" placeholder="150-300">
+
+            <label data-i18n="fbs">Šećer u krvi na prazan stomak (FBS > 120)</label>
+            <select id="add_fbs">
+                <option value="" disabled selected data-i18n="select">Odaberi</option>
+                <option value="1" data-i18n="yes">Da</option>
+                <option value="0" data-i18n="no">Ne</option>
+            </select>
+
+            <label data-i18n="restecg">EKG u mirovanju (Resting ECG)</label>
+            <select id="add_restecg">
+                <option value="" disabled selected data-i18n="select">Odaberi</option>
+                <option value="normal">normalno</option>
+                <option value="lv hypertrophy">LV hipertrofija</option>
+                <option value="ST-T wave abnormality">ST-T valni poremećaj</option>
+            </select>
+
+            <label data-i18n="thalach">Maksimalni Puls (Max Heart Rate)</label>
+            <input type="number" id="add_thalch" placeholder="70-200">
+
+            <label data-i18n="exang">Angina izazvana vježbom</label>
+            <select id="add_exang">
+                <option value="" disabled selected data-i18n="select">Odaberi</option>
+                <option value="1" data-i18n="yes">Da</option>
+                <option value="0" data-i18n="no">Ne</option>
+            </select>
+
+            <label data-tooltip="ST depresija tokom fizičkog napora. Veći broj znači veći rizik od srčanih problema.">
+    Oldpeak (Depresija ST segmenta)
+</label>
+<input type="number" step="0.1" id="add_oldpeak" placeholder="Otprilike 0-6">
+
+
+            <label data-i18n="slope">Nagib ST segmenta (Slope)</label>
+            <select id="add_slope">
+                <option value="" disabled selected data-i18n="select">Odaberi</option>
+                <option value="upsloping">rastući</option>
+                <option value="flat">ravan</option>
+                <option value="downsloping">opadajući</option>
+            </select>
+
+            <label data-i18n="ca">CA (Broj glavnih krvnih žila)</label>
+            <input type="number" id="add_ca" placeholder="0-3">
+
+            <label data-i18n="thal">Thal (Tip talasnog poremećaja)</label>
+            <select id="add_thal">
+                <option value="" disabled selected data-i18n="select">Odaberi</option>
+                <option value="normal">normalno</option>
+                <option value="fixed defect">fiksni defekt</option>
+                <option value="reversable defect">reverzibilni defekt</option>
+            </select>
+
+            <button id="addBtn" data-i18n="add_patient_btn">Dodaj Pacijenta</button>
+            <div class="result" id="addResult"></div>
+        </div>
+
+        <!-- RETRAIN CARD -->
+        <div class="card">
+            <h2 data-i18n="retrain_title">Retrain Model</h2>
+            <p data-i18n="retrain_text">Use newly added data to retrain the ML model.</p>
+            <button id="retrainBtn" data-i18n="retrain_btn">Retrain Model</button>
+            <div class="result" id="retrainResult"></div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+    <p data-i18n="footer_text">&copy; 2025 HealthPredict. Sva prava zadržana.</p>
+</footer>
+
+
+    <script src="script.js"></script>
+</body>
+</html>
