@@ -82,9 +82,7 @@ const translations = {
 
 const languageSelect = document.getElementById("languageSelect");
 
-languageSelect.addEventListener("change", () => {
-    const lang = languageSelect.value;
-
+function updateLanguage(lang) {
     document.querySelectorAll("[data-i18n]").forEach(el => {
         const key = el.getAttribute("data-i18n");
         if (translations[lang][key]) {
@@ -102,89 +100,54 @@ languageSelect.addEventListener("change", () => {
             opt.innerText = translations[lang][key];
         }
     });
-});
+}
 
-// -------- PREDICTION --------
+// Inicijalno postavi jezik
+updateLanguage(languageSelect.value);
+languageSelect.addEventListener("change", () => updateLanguage(languageSelect.value));
+
+// --- PREDICT ---
 document.getElementById("predictBtn").addEventListener("click", async () => {
-    const data = {
-        age: parseFloat(document.getElementById("age").value),
-        sex: parseInt(document.getElementById("sex").value),
-        cp: document.getElementById("cp").value,
-        trestbps: parseFloat(document.getElementById("trestbps").value),
-        chol: parseFloat(document.getElementById("chol").value),
-        fbs: parseInt(document.getElementById("fbs").value),
-        restecg: document.getElementById("restecg").value,
-        thalach: parseFloat(document.getElementById("thalach").value),
-        exang: parseInt(document.getElementById("exang").value),
-        oldpeak: parseFloat(document.getElementById("oldpeak").value),
-        slope: document.getElementById("slope").value,
-        ca: parseInt(document.getElementById("ca").value),
-        thal: document.getElementById("thal").value
-    };
-
+    const data = { /* isto kao prije */ };
     try {
         const response = await fetch("http://127.0.0.1:5000/predict", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data)
         });
-
         const result = await response.json();
+        const lang = languageSelect.value;
         document.getElementById("result").innerHTML = `
-            <strong>${translations[languageSelect.value].predict_title}:</strong> ${result.result.prediction ? "Heart Disease Risk" : "Low Risk"}<br>
+            <strong>${translations[lang].predict_title}:</strong> ${result.result.prediction ? (lang==="bs"?"Rizik od srčanih bolesti":"Heart Disease Risk") : (lang==="bs"?"Nizak rizik":"Low Risk")}<br>
             <strong>Probability:</strong> ${(result.result.probability*100).toFixed(2)}%<br>
             <strong>Top Features:</strong> ${result.top_features.map(f => f[0] + " (" + (f[1]*100).toFixed(1) + "%)").join(", ")}
         `;
-    } catch (error) {
-        console.error(error);
-        document.getElementById("result").innerText = "Error connecting to backend.";
-    }
+    } catch (error) { console.error(error); }
 });
 
-// -------- ADD NEW DATA --------
+// --- ADD DATA ---
 document.getElementById("addBtn").addEventListener("click", async () => {
-    const data = {
-        age: parseFloat(document.getElementById("add_age").value),
-        sex: parseInt(document.getElementById("add_sex").value),
-        cp: document.getElementById("add_cp").value,
-        trestbps: parseFloat(document.getElementById("add_trestbps").value),
-        chol: parseFloat(document.getElementById("add_chol").value),
-        fbs: parseInt(document.getElementById("add_fbs").value),
-        restecg: document.getElementById("add_restecg").value,
-        thalch: parseFloat(document.getElementById("add_thalch").value),
-        exang: parseInt(document.getElementById("add_exang").value),
-        oldpeak: parseFloat(document.getElementById("add_oldpeak").value),
-        slope: document.getElementById("add_slope").value,
-        ca: parseInt(document.getElementById("add_ca").value),
-        thal: document.getElementById("add_thal").value
-    };
-
+    const data = { /* isto kao prije */ };
     try {
         const response = await fetch("http://127.0.0.1:5000/add", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data)
         });
-
         const result = await response.json();
         document.getElementById("addResult").innerText = `${result.status}: ${result.message}`;
-    } catch (error) {
-        console.error(error);
-        document.getElementById("addResult").innerText = "Error adding data. Check backend.";
-    }
+    } catch (error) { console.error(error); }
 });
 
-// -------- RETRAIN MODEL --------
+// --- RETRAIN MODEL ---
 document.getElementById("retrainBtn").addEventListener("click", async () => {
-    document.getElementById("retrainResult").innerText = "Retraining model, please wait...";
+    const lang = languageSelect.value;
+    document.getElementById("retrainResult").innerText = lang === "bs" ? "Ponovno treniranje modela, molimo sačekajte..." : "Retraining model, please wait...";
     try {
-        const response = await fetch("http://127.0.0.1:5000/retrain", {
-            method: "POST"
-        });
+        const response = await fetch("http://127.0.0.1:5000/retrain", { method: "POST" });
         const result = await response.json();
         document.getElementById("retrainResult").innerText = `${result.status}: ${result.message}`;
     } catch (error) {
-        console.error(error);
-        document.getElementById("retrainResult").innerText = "Error retraining model. Check backend.";
+        document.getElementById("retrainResult").innerText = lang==="bs" ? "Greška prilikom retreniranja modela." : "Error retraining model. Check backend.";
     }
 });

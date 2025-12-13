@@ -1,22 +1,27 @@
 body {
-    font-family: 'Roboto', sans-serif;
+    font-family: "Noto Serif Yezidi", serif;
+  font-optical-sizing: auto;
+  font-style: normal;
     background: url('dna-3539309.jpg') no-repeat center center fixed;
     background-size: cover;
     margin: 0;
     padding: 0;
     overflow-x: hidden;
 }
+
 /* HEADER */
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 20px 40px;
-    background: rgba(44, 62, 80, 0.85); /* blago transparentno */
-    backdrop-filter: blur(10px); /* stakleni efekt */
+    background: rgba(44, 62, 80, 0.85);
+    /* blago transparentno */
+    backdrop-filter: blur(10px);
+    /* stakleni efekt */
     color: #fff;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     position: sticky;
     top: 0;
     z-index: 100;
@@ -24,9 +29,12 @@ body {
 
 .header h1 {
     margin: 0;
-    font-size: 26px;
-    font-weight: 700;
+    font-size: 46px;
     letter-spacing: 1px;
+
+    font-family: "Jaini", system-ui;
+    font-weight: 400;
+    font-style: normal;
 }
 
 .header-right {
@@ -38,6 +46,7 @@ body {
 .header-right label {
     font-weight: 500;
     color: #f0f0f0;
+    margin-bottom: 12px;
 }
 
 .header-right select {
@@ -45,14 +54,14 @@ body {
     border-radius: 8px;
     border: none;
     font-size: 14px;
-    background: rgba(255,255,255,0.1);
-    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+    color:#e0e0e0;
     cursor: pointer;
-    transition: background 0.3s;
 }
 
-.header-right select:hover, .header-right select:focus {
-    background: rgba(255,255,255,0.2);
+.header-right select:hover,
+.header-right select:focus {
+    background: rgba(255, 255, 255, 0.2);
     outline: none;
 }
 
@@ -67,8 +76,8 @@ body {
     margin-top: 40px;
     font-size: 14px;
     letter-spacing: 0.5px;
-    box-shadow: 0 -6px 20px rgba(0,0,0,0.15);
-    border-top: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.15);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .container {
@@ -83,34 +92,46 @@ body {
     background: rgba(255, 255, 255, 0.97);
     padding: 35px 30px;
     border-radius: 18px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.18);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.18);
 }
 
 h2 {
     margin-bottom: 25px;
     color: #2c3e50;
     text-align: center;
+
+    font-family: "Jaini", system-ui;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 40px;
 }
 
 label {
     display: block;
     margin-top: 18px;
     font-weight: 500;
+    font-size: 20px;
+    color: #2c3e50;
 }
 
-input, select {
+input,
+select,
+textarea {
     width: 100%;
     padding: 12px;
     margin-top: 6px;
     border-radius: 10px;
     border: 1px solid #ccc;
     font-size: 15px;
+    box-sizing: border-box;
 }
 
-input:focus, select:focus {
+
+input:focus,
+select:focus {
     outline: none;
     border-color: #2575fc;
-    box-shadow: 0 0 8px rgba(37,117,252,0.3);
+    box-shadow: 0 0 8px rgba(37, 117, 252, 0.3);
 }
 
 button {
@@ -129,7 +150,7 @@ button {
 
 button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
 .result {
@@ -138,33 +159,4 @@ button:hover {
     padding: 20px;
     border-radius: 12px;
     font-size: 16px;
-}
-
-
-/* Tooltip stil */
-label[data-tooltip] {
-    position: relative;
-    cursor: help;
-}
-
-label[data-tooltip]::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: 125%; /* iznad labela */
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: rgba(0,0,0,0.85);
-    color: #fff;
-    padding: 6px 10px;
-    border-radius: 6px;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s;
-    font-size: 13px;
-    z-index: 10;
-}
-
-label[data-tooltip]:hover::after {
-    opacity: 1;
 }
