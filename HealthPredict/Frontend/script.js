@@ -255,6 +255,7 @@ document.getElementById("retrainBtn").addEventListener("click", async () => {
     retrainDiv.classList.remove("success", "error", "hide");
     retrainDiv.style.display = "block";
     retrainDiv.style.opacity = 1;
+    retrainDiv.style.color = "green";
     retrainDiv.innerText = lang === "bs" ? "Ponovno treniranje modela, molimo sačekajte..." : "Retraining model, please wait...";
 
     try {
