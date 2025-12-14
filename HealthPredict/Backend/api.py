@@ -27,44 +27,78 @@ def predict_endpoint():
 @app.route("/add", methods=["POST"])
 def add_data():
     try:
-        df = load_data()  # prvo učitaj postojeći DataFrame
+        df = load_data()  # postojeći DataFrame
         data = request.json
 
-        # Dodaj default vrijednosti za polja koja frontend ne šalje
+        # Konverzija svih numeričkih polja
+        numeric_fields = ["age","sex","trestbps","chol","fbs","thalch","exang","oldpeak","ca"]
+        for field in numeric_fields:
+            if field not in data or data[field] in ["", None]:
+                return jsonify({"status": "error",
+                                "message_bs": "Molimo popunite sva obavezna polja.",
+                                "message_en": "Please fill all required fields."}), 400
+            data[field] = float(data[field])  # ili int ako treba
+
+        # Polja tipa string
+        string_fields = ["cp","restecg","slope","thal"]
+        for field in string_fields:
+            if field not in data or data[field] in ["", None]:
+                return jsonify({"status": "error",
+                                "message_bs": "Molimo popunite sva obavezna polja.",
+                                "message_en": "Please fill all required fields."}), 400
+
+        # Dodavanje default vrijednosti za interne kolone
         data.setdefault("id", len(df) + 1)
         data.setdefault("dataset", "new")
         data.setdefault("num", 0)
 
-        # Polja koja stvarno šalje frontend
-        required_fields = [f for f in df.columns if f not in ["id", "dataset", "num"]]
-        missing = [f for f in required_fields if f not in data]
-        if missing:
-            return jsonify({"status": "error", "message": f"Missing fields: {missing}"}), 400
-
-        # Dodavanje novog reda u DataFrame
-        new_row = pd.DataFrame([data])
-        df = pd.concat([df, new_row], ignore_index=True)
-
-        # Spremanje u CSV
+        # Dodavanje u DataFrame i spremanje
+        df = pd.concat([df, pd.DataFrame([data])], ignore_index=True)
         df.to_csv("data/heart.csv", index=False)
 
-        return jsonify({"status": "success", "message": "Record added successfully"})
+        return jsonify({"status": "success",
+                        "message_bs": "Pacijent uspješno dodan.",
+                        "message_en": "Patient added successfully."})
+
     except Exception as e:
         print("Add Data Error:", e)
-        return jsonify({"status": "error", "message": str(e)}), 500
+        return jsonify({"status": "error",
+                        "message_bs": f"Greška: {str(e)}",
+                        "message_en": f"Error: {str(e)}"}), 500
 
 
 
 @app.route("/retrain", methods=["POST"])
 def retrain():
     try:
+        # učitaj podatke i filtriraj samo validne
+        df = load_data()
+        df = df.dropna()  # ukloni sve redove sa NaN
+        if df.empty:
+            return jsonify({
+        "status": "error",
+        "message_bs": "Nije moguće retrenirati model jer nema validnih korisnika.",
+        "message_en": "Cannot retrain the model because there are no valid users."
+            })
+
+
         os.system("python train_model.py")  # pokreni retraining
         global model, scaler, features
         model, scaler, features = load_model()  # reload model
-        return jsonify({"status": "success", "message": "Model retrained and reloaded"})
+
+        return jsonify({
+            "status": "success",
+            "message_bs": "Model je uspješno retreniran i ponovno učitan.",
+            "message_en": "Model retrained and reloaded successfully."
+        })
+
     except Exception as e:
         print("Retrain Error:", e)
-        return jsonify({"status": "error", "message": str(e)}), 500
+        return jsonify({
+            "status": "error",
+            "message_bs": f"Greška prilikom retreniranja: {str(e)}",
+            "message_en": f"Error retraining model: {str(e)}"
+        }), 500
 
 if __name__ == "__main__":
     app.run(debug=True)

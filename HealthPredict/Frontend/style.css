@@ -155,8 +155,85 @@ button:hover {
 
 .result {
     margin-top: 20px;
-    background: #f2f4f8;
     padding: 20px;
     border-radius: 12px;
     font-size: 16px;
+    color: #666;
+    opacity: 1;             /* vidljivo po defaultu */
+    transition: opacity 0.5s ease;
+    display: block;          /* osiguraj da bude prikazano */
+}
+
+.result.hide {
+    opacity: 0;
+    display: none;           /* nakon fade-outa potpuno nestane */
+}
+
+#retrainResult {
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 12px;
+    font-size: 16px;
+    color: #fff;
+    display: none; /* po defaultu skriveno */
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
+
+#retrainResult.success {
+    background-color:#a9fba9;; 
+    display: block;
+}
+
+#retrainResult.error {
+    background-color: #c0392b; /* tamno crvena */
+    display: block;
+}
+
+
+
+
+.hint {
+    display: none;
+    font-size: 13px;
+    color: #666;
+}
+
+input:focus + .hint,
+select:focus + .hint {
+    display: block;
+}
+.result.prediction {
+    margin-top: 25px;
+    padding: 20px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 500;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.result.prediction.high {
+    background-color: #ffe6e6; /* svijetlo crveno */
+    color: #c0392b; /* tamnocrvena */
+    border: 1px solid #e74c3c;
+}
+
+.result.prediction.low {
+    background-color: #e6ffe6; /* svijetlo zeleno */
+    color: #27ae60; /* tamno zelena */
+    border: 1px solid #2ecc71;
+}
+
+.result.prediction .probability {
+    font-size: 20px;
+    font-weight: 700;
+    margin-top: 5px;
+}
+
+.result.prediction .top-features {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #34495e;
 }

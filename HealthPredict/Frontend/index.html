@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="bs">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HealthPredict</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-   
+
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Jaini&family=Rubik+Storm&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jaini&family=Rubik+Storm&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <!-- HEADER -->
     <header class="header">
@@ -46,14 +48,14 @@
             <label data-i18n="cp">Tip angine</label>
             <select id="cp">
                 <option value="" disabled selected data-i18n="select">Odaberi</option>
-                <option value="typical angina">typical angina</option>
-                <option value="asymptomatic">asymptomatic</option>
-                <option value="non-anginal">non-anginal</option>
-                <option value="atypical angina">atypical angina</option>
+                <option value="typical angina" data-i18n="typical_angina">tipična angina</option>
+                <option value="asymptomatic" data-i18n="asymptomatic">asimptomatska</option>
+                <option value="non-anginal" data-i18n="nonanginal">ne-anginalna</option>
+                <option value="atypical angina" data-i18n="atypical_angina">atipična angina</option>
             </select>
 
             <label data-i18n="trestbps">Krvni pritisak u mirovanju</label>
-            <input type="number" id="trestbps" placeholder="100-180">
+            <input type="number" id="trestbps" placeholder="100-130">
 
             <label data-i18n="chol">Holesterol</label>
             <input type="number" id="chol" placeholder="150-300">
@@ -68,13 +70,13 @@
             <label data-i18n="restecg">EKG u mirovanju</label>
             <select id="restecg">
                 <option value="" disabled selected data-i18n="select">Odaberi</option>
-                <option value="normal">normalno</option>
-                <option value="lv hypertrophy">LV hipertrofija</option>
-                <option value="ST-T wave abnormality">ST-T valni poremećaj</option>
+                <option value="normal" data-i18n="normal">normalno</option>
+                <option value="lv hypertrophy" data-i18n="lv_hypertrophy">LV hipertrofija</option>
+                <option value="ST-T wave abnormality" data-i18n="stt">ST-T valni poremećaj</option>
             </select>
 
             <label data-i18n="thalach">Maksimalni puls</label>
-            <input type="number" id="thalach" placeholder="70-200">
+            <input type="number" id="thalach" placeholder="60-120">
 
             <label data-i18n="exang">Angina izazvana vježbom</label>
             <select id="exang">
@@ -85,33 +87,49 @@
 
             <label data-i18n="oldpeak">Oldpeak</label>
             <input type="number" step="0.1" id="oldpeak" placeholder="0-6">
+            <small class="hint" data-i18n="oldpeakOpis">Oldpeak pokazuje koliko se EKG promijenio kada je srce bilo pod
+                opterećenjem. Te promjene mogu ukazivati na smanjen dotok krvi u srce.</small>
 
             <label data-i18n="slope">Nagib ST segmenta</label>
             <select id="slope">
                 <option value="" disabled selected data-i18n="select">Odaberi</option>
-                <option value="upsloping">rastući</option>
-                <option value="flat">ravan</option>
-                <option value="downsloping">opadajući</option>
+                <option value="upsloping" data-i18n="upsloping">rastući</option>
+                <option value="flat" data-i18n="flat">ravan</option>
+                <option value="downsloping" data-i18n="downsloping">opadajući</option>
             </select>
+            <small class="hint" data-i18n="nagibStSegmenta">Nagib opisuje da li ST segment ide gore, dolje ili je ravan.
+                ST segment je dio EKG zapisa: nalazi se između QRS kompleksa i T talasa;
+                predstavlja fazu kada su komore srca potpuno depolarizirane; normalno treba biti ravan i na istoj liniji
+                kao osnovna (izoelektrična) linija.
+            </small>
 
             <label data-i18n="ca">CA</label>
             <input type="number" id="ca" placeholder="0-3">
+            <small class="hint" data-i18n="caOpis">CA pokazuje koliko velikih krvnih sudova koji vode krv do srca je
+                vidljivo / blokirano na osnovu koronarografije.
+                0 -- Nema blokiranih sudova (najbolje stanje); 1 -- Jedna arterija zahvaćena; 2 -- Dvije arterije
+                zahvaćene; 3 -- Tri arterije zahvaćene.
+            </small>
 
             <label data-i18n="thal">Thal</label>
             <select id="thal">
                 <option value="" disabled selected data-i18n="select">Odaberi</option>
-                <option value="normal">normalno</option>
-                <option value="fixed defect">fiksni defekt</option>
-                <option value="reversable defect">reverzibilni defekt</option>
+                <option value="normal" data-i18n="normal">normalno</option>
+                <option value="fixed defect" data-i18n="fixed_defect">fiksni defekt</option>
+                <option value="reversable defect" data-i18n="reversable_defect">reverzibilni defekt</option>
             </select>
+            <small class="hint" data-i18n="thalOpis">Thal opisuje rezultat thallium stres testa srca, koji se koristi za
+                procjenu prokrvljenosti srčanog mišića.</small>
 
-            <button id="predictBtn" data-i18n="predict_btn">Predvidi Rizik</button>
-            <div class="result" id="result"></div>
+            <button id="predictBtn" data-i18n="predict_btn">Predvidi rizik</button>
+            <div class="result" id="result" data-i18n="rezultat">
+                Ovdje će biti prikazan rezultat procjene rizika za srčane bolesti.
+            </div>
         </div>
 
         <!-- ADD DATA CARD -->
         <div class="card">
-            <h2 data-i18n="add_patient_title">Dodaj Novog Pacijenta</h2>
+            <h2 data-i18n="add_patient_title">Dodaj novog pacijenta</h2>
 
             <label data-i18n="age">Starost</label>
             <input type="number" id="add_age" placeholder="40-70">
@@ -123,17 +141,17 @@
                 <option value="0" data-i18n="female">Ženski</option>
             </select>
 
-            <label data-i18n="cp">Tip Angine</label>
+            <label data-i18n="cp">Tip angine</label>
             <select id="add_cp">
                 <option value="" disabled selected data-i18n="select">Odaberi</option>
-                <option value="typical angina">tipična angina</option>
-                <option value="asymptomatic">asimptomatska</option>
-                <option value="non-anginal">ne-anginalna</option>
-                <option value="atypical angina">atipična angina</option>
+                <option value="typical angina" data-i18n="typical_angina">tipična angina</option>
+                <option value="asymptomatic" data-i18n="asymptomatic">asimptomatska</option>
+                <option value="non-anginal" data-i18n="nonanginal">ne-anginalna</option>
+                <option value="atypical angina" data-i18n="atypical_angina">atipična angina</option>
             </select>
 
             <label data-i18n="trestbps">Krvni pritisak u mirovanju</label>
-            <input type="number" id="add_trestbps" placeholder="100-180">
+            <input type="number" id="add_trestbps" placeholder="100-130">
 
             <label data-i18n="chol">Holesterol</label>
             <input type="number" id="add_chol" placeholder="150-300">
@@ -154,7 +172,7 @@
             </select>
 
             <label data-i18n="thalach">Maksimalni puls</label>
-            <input type="number" id="add_thalch" placeholder="70-200">
+            <input type="number" id="add_thalch" placeholder="60-120">
 
             <label data-i18n="exang">Angina izazvana vježbom</label>
             <select id="add_exang">
@@ -165,35 +183,49 @@
 
             <label data-i18n="oldpeak">Oldpeak</label>
             <input type="number" step="0.1" id="add_oldpeak" placeholder="0-6">
+            <small class="hint" data-i18n="oldpeakOpis">Oldpeak pokazuje koliko se EKG promijenio kada je srce bilo pod
+                opterećenjem. Te promjene mogu ukazivati na smanjen dotok krvi u srce.</small>
 
             <label data-i18n="slope">Nagib ST segmenta</label>
             <select id="add_slope">
                 <option value="" disabled selected data-i18n="select">Odaberi</option>
-                <option value="upsloping">rastući</option>
-                <option value="flat">ravan</option>
-                <option value="downsloping">opadajući</option>
+                <option value="upsloping" data-i18n="upsloping">rastući</option>
+                <option value="flat" data-i18n="flat">ravan</option>
+                <option value="downsloping" data-i18n="downsloping">opadajući</option>
             </select>
+            <small class="hint" data-i18n="nagibStSegmenta">Nagib opisuje da li ST segment ide gore, dolje ili je ravan.
+                ST segment je dio EKG zapisa: nalazi se između QRS kompleksa i T talasa;
+                predstavlja fazu kada su komore srca potpuno depolarizirane; normalno treba biti ravan i na istoj liniji
+                kao osnovna (izoelektrična) linija.
+            </small>
 
             <label data-i18n="ca">CA</label>
             <input type="number" id="add_ca" placeholder="0-3">
+            <small class="hint" data-i18n="caOpis">CA pokazuje koliko velikih krvnih sudova koji vode krv do srca je
+                vidljivo / blokirano na osnovu koronarografije.
+                0 -- Nema blokiranih sudova (najbolje stanje); 1 -- Jedna arterija zahvaćena; 2 -- Dvije arterije
+                zahvaćene; 3 -- Tri arterije zahvaćene.
+            </small>
 
             <label data-i18n="thal">Thal</label>
             <select id="add_thal">
                 <option value="" disabled selected data-i18n="select">Odaberi</option>
-                <option value="normal">normalno</option>
-                <option value="fixed defect">fiksni defekt</option>
-                <option value="reversable defect">reverzibilni defekt</option>
+                <option value="normal" data-i18n="normal">normalno</option>
+                <option value="fixed defect" data-i18n="fixed_defect">fiksni defekt</option>
+                <option value="reversable defect" data-i18n="reversable_defect">reverzibilni defekt</option>
             </select>
+            <small class="hint" data-i18n="thalOpis">Thal opisuje rezultat thallium stres testa srca, koji se koristi za
+                procjenu prokrvljenosti srčanog mišića.</small>
 
-            <button id="addBtn" data-i18n="add_patient_btn">Dodaj Pacijenta</button>
+            <button id="addBtn" data-i18n="add_patient_btn">Dodaj pacijenta</button>
             <div class="result" id="addResult"></div>
         </div>
 
         <!-- RETRAIN CARD -->
         <div class="card">
-            <h2 data-i18n="retrain_title">Retreniraj Model</h2>
+            <h2 data-i18n="retrain_title">Retreniraj model</h2>
             <p data-i18n="retrain_text">Koristi novododate podatke za ponovno treniranje ML modela</p>
-            <button id="retrainBtn" data-i18n="retrain_btn">Retreniraj Model</button>
+            <button id="retrainBtn" data-i18n="retrain_btn">Retreniraj model</button>
             <div class="result" id="retrainResult"></div>
         </div>
     </div>
@@ -205,4 +237,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>
