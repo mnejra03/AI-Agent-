@@ -186,7 +186,7 @@ button:hover {
 }
 
 #retrainResult.error {
-    background-color: #c0392b; /* tamno crvena */
+    background-color: #f4ddda; /* tamno crvena */
     display: block;
 }
 
