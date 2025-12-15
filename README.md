@@ -3,19 +3,20 @@
 
 HealthPredict is a web-based AI application designed to predict the risk of heart disease based on patient medical data. The system uses a Random Forest Classifier and supports adding new patient data as well as retraining the model.
 
-🔍 Features:
--Heart disease risk prediction (low / high)
--Risk probability
--Most influential features
--Adding new patient data
--Model retraining
+## 🔍 Features:
+- Heart disease risk prediction (low / high)
+- Risk probability
+- Most influential features
+- Adding new patient data
+- Model retraining
 
-🛠️ Technologies:
--Backend: Python, Flask, Scikit-learn, Pandas
--Frontend: HTML, CSS, JavaScript
--Model: Random Forest Classifier
+## 🛠️ Technologies:
+- **Backend**: Python, Flask, Scikit-learn, Pandas
+- **Frontend**: HTML, CSS, JavaScript
+- **Model**: Random Forest Classifier
 
-⚙️ Running the Project
+## ⚙️ Running the Project
+```bash
       python -m venv venv
       .\venv\Scripts\activate
       pip install -r requirements.txt
