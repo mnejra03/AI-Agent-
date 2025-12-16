@@ -13,8 +13,7 @@ MODEL_PATH = "models/rf_model.joblib"
 
 def load_data():
     df = pd.read_csv(DATA_PATH)
-    df = df.copy()  # izbjegava SettingWithCopyWarning
-    # Kreiraj target kolonu ako ne postoji
+    df = df.copy()  
     if "target" not in df.columns:
         if "num" in df.columns:
             df.loc[:, "target"] = df["num"].apply(lambda x: 1 if x > 0 else 0)
@@ -23,27 +22,21 @@ def load_data():
     return df
 
 def preprocess(df: pd.DataFrame):
-    # Ukloni sve redove koji su potpuno prazni
     df = df.dropna(how="all")
 
     X = df.drop(columns=["target"], errors="ignore")
     y = df["target"]
 
-    # Numeričke kolone za skaliranje i imputaciju
     numeric_cols = X.select_dtypes(include=["int64", "float64"]).columns.tolist()
     cat_cols = X.select_dtypes(include=["object"]).columns.tolist()
 
-    # Imputacija za numeričke kolone
     imputer = SimpleImputer(strategy="mean")
     X_numeric = pd.DataFrame(imputer.fit_transform(X[numeric_cols]), columns=numeric_cols)
 
-    # Kodiranje kategorijskih kolona (one-hot)
     X_cat = pd.get_dummies(X[cat_cols], drop_first=True)
 
-    # Spoji
     X_processed = pd.concat([X_numeric, X_cat], axis=1)
 
-    # Skaliranje
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X_processed)
 
@@ -77,13 +70,11 @@ def main():
     print("Dijeljenje na trening i test set...")
     X_train, X_test, y_train, y_test = split_data(X, y)
 
-    # Logistic Regression baseline
     print("Treniranje LogisticRegression...")
     log = LogisticRegression(max_iter=1000)
     log.fit(X_train, y_train)
     print("Logistic Regression metrics:", evaluate_model(log, X_test, y_test))
 
-    # Random Forest sa GridSearch
     print("Treniranje RandomForest sa GridSearch...")
     rf = RandomForestClassifier(random_state=42)
     param_grid = {
@@ -97,7 +88,6 @@ def main():
     print("Random Forest metrics:", evaluate_model(best_rf, X_test, y_test))
     print("Best RF params:", grid.best_params_)
 
-    # Spremi model + scaler + feature names
     os.makedirs("models", exist_ok=True)
     joblib.dump({"model": best_rf, "scaler": scaler, "features": feature_names}, MODEL_PATH)
     print(f"Model spremljen u {MODEL_PATH}")

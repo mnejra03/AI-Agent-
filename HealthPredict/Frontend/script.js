@@ -38,15 +38,15 @@ const translations = {
         fixed_defect: "fiksni defekt",
         reversable_defect: "reverzibilni defekt",
         footer_text: "© 2025 HealthPredict. Sva prava zadržana.",
-        typical_angina:"tipična angina",
-        asymptomatic:"asimptomatska",
-        nonanginal:"ne-anginalna",
-        atypical_angina:"atipična angina",
+        typical_angina: "tipična angina",
+        asymptomatic: "asimptomatska",
+        nonanginal: "ne-anginalna",
+        atypical_angina: "atipična angina",
         oldpeakOpis: "Oldpeak pokazuje koliko se EKG promijenio kada je srce bilo pod opterećenjem. Mjeri se u milimetrima (mm). Predstavlja razliku između ST-segmenta u mirovanju i tokom napora.",
-        nagibStSegmenta:"Nagib opisuje da li ST segment ide gore, dolje ili je ravan. ST segment je dio EKG zapisa: nalazi se između QRS kompleksa i T talasa; predstavlja fazu kada su komore srca potpuno depolarizirane; normalno treba biti ravan i na istoj liniji kao osnovna (izoelektrična) linija.",
-        caOpis:"CA pokazuje koliko velikih krvnih sudova koji vode krv do srca je vidljivo / blokirano na osnovu koronarografije. 0 -- Nema blokiranih sudova (najbolje stanje); 1 -- Jedna arterija zahvaćena; 2 -- Dvije arterije zahvaćene; 3 -- Tri arterije zahvaćene.",
-        thalOpis:"Thal opisuje rezultat thallium stres testa srca, koji se koristi za procjenu prokrvljenosti srčanog mišića.",
-        rezultat:"Ovdje će biti prikazan rezultat procjene rizika za srčane bolesti."
+        nagibStSegmenta: "Nagib opisuje da li ST segment ide gore, dolje ili je ravan. ST segment je dio EKG zapisa: nalazi se između QRS kompleksa i T talasa; predstavlja fazu kada su komore srca potpuno depolarizirane; normalno treba biti ravan i na istoj liniji kao osnovna (izoelektrična) linija.",
+        caOpis: "CA pokazuje koliko velikih krvnih sudova koji vode krv do srca je vidljivo / blokirano na osnovu koronarografije. 0 -- Nema blokiranih sudova (najbolje stanje); 1 -- Jedna arterija zahvaćena; 2 -- Dvije arterije zahvaćene; 3 -- Tri arterije zahvaćene.",
+        thalOpis: "Thal opisuje rezultat thallium stres testa srca, koji se koristi za procjenu prokrvljenosti srčanog mišića.",
+        rezultat: "Ovdje će biti prikazan rezultat procjene rizika za srčane bolesti."
     },
     en: {
         language_label: "Language:",
@@ -86,15 +86,15 @@ const translations = {
         fixed_defect: "fixed defect",
         reversable_defect: "reversable defect",
         footer_text: "© 2025 HealthPredict. All rights reserved.",
-        typical_angina:"typical angina",
-        asymptomatic:"asymptomatic",
-        nonanginal:"nonanginal",
-        atypical_angina:"atypical angina",
-        oldpeakOpis:"Oldpeak shows how much the ECG changed when the heart was under stress. It is measured in millimeters (mm). It represents the difference between the ST-segment at rest and during exertion.",
-        nagibStSegmenta:"The slope describes whether the ST segment is going up, down, or flat. The ST segment is a part of the ECG trace: it is located between the QRS complex and the T wave; represents the phase when the heart's ventricles are completely depolarized; normally it should be flat and on the same line as the baseline (isoelectric) line.",
-        caOpis:"CA shows how many of the large blood vessels that carry blood to the heart are visible/blocked based on coronary angiography. 0 -- No blocked vessels (best condition); 1 -- One artery involved; 2 -- Two arteries involved; 3 -- Three arteries involved.",
-        thalOpis:"Thal describes the result of a thallium cardiac stress test, which is used to assess blood flow to the heart muscle.",
-        rezultat:"The result of the heart disease risk assessment will be displayed here."        
+        typical_angina: "typical angina",
+        asymptomatic: "asymptomatic",
+        nonanginal: "nonanginal",
+        atypical_angina: "atypical angina",
+        oldpeakOpis: "Oldpeak shows how much the ECG changed when the heart was under stress. It is measured in millimeters (mm). It represents the difference between the ST-segment at rest and during exertion.",
+        nagibStSegmenta: "The slope describes whether the ST segment is going up, down, or flat. The ST segment is a part of the ECG trace: it is located between the QRS complex and the T wave; represents the phase when the heart's ventricles are completely depolarized; normally it should be flat and on the same line as the baseline (isoelectric) line.",
+        caOpis: "CA shows how many of the large blood vessels that carry blood to the heart are visible/blocked based on coronary angiography. 0 -- No blocked vessels (best condition); 1 -- One artery involved; 2 -- Two arteries involved; 3 -- Three arteries involved.",
+        thalOpis: "Thal describes the result of a thallium cardiac stress test, which is used to assess blood flow to the heart muscle.",
+        rezultat: "The result of the heart disease risk assessment will be displayed here."
     }
 };
 
@@ -124,15 +124,54 @@ function updateLanguage(lang) {
 updateLanguage(languageSelect.value);
 languageSelect.addEventListener("change", () => updateLanguage(languageSelect.value));
 
+
+const featureLabels = {
+    bs: {
+        num: null,
+        id: null,
+
+        thalch: "Maksimalni puls",
+        "cp_atypical angina": "Atipična angina",
+        "cp_typical angina": "Tipična angina",
+        "cp_non-anginal": "Ne-anginalni bol u prsima",
+        exang_True: "Angina izazvana fizičkom aktivnošću",
+        exang_False: "Nema angine pri naporu",
+        oldpeak: "ST depresija (Oldpeak)",
+        ca: "Broj zahvaćenih krvnih sudova",
+        thal_normal: "Normalan thallium test",
+        "thal_reversable defect": "Reverzibilni defekt (thal)"
+    },
+
+    en: {
+        num: null,
+        id: null,
+
+        thalch: "Maximum heart rate",
+        "cp_atypical angina": "Atypical angina",
+        "cp_typical angina": "Typical angina",
+        "cp_non-anginal": "Non-anginal chest pain",
+        exang_True: "Exercise-induced angina",
+        exang_False: "No exercise-induced angina",
+        oldpeak: "ST depression (Oldpeak)",
+        ca: "Number of affected vessels",
+        thal_normal: "Normal thallium test",
+        "thal_reversable defect": "Reversible thallium defect"
+    }
+};
+
+
+
+
+
 // --- PREDICT ---
 document.getElementById("predictBtn").addEventListener("click", async () => {
     const resultDiv = document.getElementById("result");
     const lang = languageSelect.value;
 
     // --- Prije predikcije ne mijenjamo boju, samo prikažemo tekst ---
-    resultDiv.innerText = lang==="bs" ? "Procjena u toku..." : "Predicting...";
+    resultDiv.innerText = lang === "bs" ? "Procjena u toku..." : "Predicting...";
 
-    const data = { 
+    const data = {
         age: parseFloat(document.getElementById("age").value),
         sex: parseInt(document.getElementById("sex").value),
         cp: document.getElementById("cp").value,
@@ -157,21 +196,29 @@ document.getElementById("predictBtn").addEventListener("click", async () => {
         const result = await response.json();
 
         // --- Nakon predikcije mijenjamo boju prema riziku ---
-        if(result.result.prediction) {
+        if (result.result.prediction) {
             resultDiv.style.backgroundColor = "#ffcccc"; // crveno za visok rizik
         } else {
             resultDiv.style.backgroundColor = "#ccffcc"; // zeleno za nizak rizik
         }
 
         resultDiv.innerHTML = `
-            <strong>${translations[lang].predict_title}:</strong> ${result.result.prediction ? (lang==="bs"?"Visok rizik":"High Risk") : (lang==="bs"?"Nizak rizik":"Low Risk")}<br>
-            <strong>Probability:</strong> ${(result.result.probability*100).toFixed(2)}%<br>
-            <strong>Top Features:</strong> ${result.top_features.map(f => f[0] + " (" + (f[1]*100).toFixed(1) + "%)").join(", ")}
+            <strong>${translations[lang].predict_title}:</strong> ${result.result.prediction ? (lang === "bs" ? "Visok rizik" : "High Risk") : (lang === "bs" ? "Nizak rizik" : "Low Risk")}<br>
+            <strong>${lang === "bs" ? "Vjerovatnoća: " : "Probability"}:</strong> ${(result.result.probability * 100).toFixed(2)}%<br>
+            <strong>${lang === "bs" ? "Najutjecajnije karakteristike" : "Top features"}:</strong>
+            ${result.top_features
+                .filter(f => featureLabels[lang][f[0]] !== null)
+                .filter(f => f[0] !== "id")
+                .map(f => `${featureLabels[lang][f[0]] || f[0]} (${(f[1] * 100).toFixed(1)}%)`)
+                .join(", ")
+            }
+
+
         `;
-    } catch (error) { 
-        console.error(error); 
+    } catch (error) {
+        console.error(error);
         resultDiv.style.backgroundColor = "#f8d7da"; // crveno za grešku
-        resultDiv.innerText = lang==="bs" ? "Greška prilikom predikcije." : "Error predicting."; 
+        resultDiv.innerText = lang === "bs" ? "Greška prilikom predikcije." : "Error predicting.";
     }
 });
 
@@ -218,11 +265,11 @@ document.getElementById("addBtn").addEventListener("click", async () => {
 
         const result = await response.json();
 
-        if(result.status === "success") {
-            addResultDiv.style.backgroundColor = "#ccffcc"; 
+        if (result.status === "success") {
+            addResultDiv.style.backgroundColor = "#ccffcc";
             addResultDiv.innerText = lang === "bs" ? "Pacijent uspješno dodan." : "Patient added successfully.";
         } else {
-            addResultDiv.style.backgroundColor = "#ffcccc"; 
+            addResultDiv.style.backgroundColor = "#ffcccc";
             addResultDiv.innerText = lang === "bs" ? "Dodavanje pacijenta nije uspjelo." : "Failed to add patient.";
         }
 
@@ -264,13 +311,13 @@ document.getElementById("retrainBtn").addEventListener("click", async () => {
 
         retrainDiv.classList.remove("hide");
 
-        if(result.status.toLowerCase() === "success") {
+        if (result.status.toLowerCase() === "success") {
             retrainDiv.classList.add("success");
             retrainDiv.innerText = lang === "bs" ? result.message_bs : result.message_en;
         } else {
             retrainDiv.classList.add("error");
-            retrainDiv.innerText = lang === "bs" ? (result.message_bs || "Greška prilikom retreniranja modela.") 
-                                                 : (result.message_en || "Error retraining model.");
+            retrainDiv.innerText = lang === "bs" ? (result.message_bs || "Greška prilikom retreniranja modela.")
+                : (result.message_en || "Error retraining model.");
         }
 
     } catch (error) {

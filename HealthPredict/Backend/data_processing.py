@@ -8,25 +8,19 @@ def load_data(path="data/heart.csv"):
     return df
 
 def preprocess(df):
-    # uklanjamo redove sa nedostajućim vrijednostima
     df = df.dropna()
 
-    # target: 0 = nema bolesti, 1 ako je num >0
     df["target"] = df["num"].apply(lambda x: 1 if x > 0 else 0)
     y = df["target"]
 
-    # uklanjamo nebitne kolone
     X = df.drop(["num", "target", "id", "dataset"], axis=1)
 
-    # Enkodiranje binarnih kategorija
     X["sex"] = X["sex"].map({"Male":1, "Female":0})
     X["fbs"] = X["fbs"].map({True:1, False:0})
     X["exang"] = X["exang"].map({True:1, False:0})
 
-    # Enkodiranje ostalih kategorijskih varijabli
     X = pd.get_dummies(X, columns=["cp","restecg","slope","thal"], drop_first=True)
 
-    # skaliranje numeričkih vrijednosti
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
 
