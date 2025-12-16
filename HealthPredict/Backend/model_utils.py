@@ -8,7 +8,6 @@ def load_model():
 def predict(model, scaler, features, data: dict):
     X = pd.DataFrame([data])
 
-    # poravnaj feature-e
     X = X.reindex(columns=features, fill_value=0)
 
     X_scaled = scaler.transform(X)

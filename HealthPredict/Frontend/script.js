@@ -1,4 +1,3 @@
-// -------- I18N --------
 const translations = {
     bs: {
         language_label: "Jezik:",
@@ -120,7 +119,7 @@ function updateLanguage(lang) {
     });
 }
 
-// Inicijalno postavi jezik
+
 updateLanguage(languageSelect.value);
 languageSelect.addEventListener("change", () => updateLanguage(languageSelect.value));
 
@@ -161,14 +160,10 @@ const featureLabels = {
 
 
 
-
-
-// --- PREDICT ---
 document.getElementById("predictBtn").addEventListener("click", async () => {
     const resultDiv = document.getElementById("result");
     const lang = languageSelect.value;
 
-    // --- Prije predikcije ne mijenjamo boju, samo prikažemo tekst ---
     resultDiv.innerText = lang === "bs" ? "Procjena u toku..." : "Predicting...";
 
     const data = {
@@ -195,11 +190,10 @@ document.getElementById("predictBtn").addEventListener("click", async () => {
         });
         const result = await response.json();
 
-        // --- Nakon predikcije mijenjamo boju prema riziku ---
         if (result.result.prediction) {
-            resultDiv.style.backgroundColor = "#ffcccc"; // crveno za visok rizik
+            resultDiv.style.backgroundColor = "#ffcccc"; 
         } else {
-            resultDiv.style.backgroundColor = "#ccffcc"; // zeleno za nizak rizik
+            resultDiv.style.backgroundColor = "#ccffcc"; 
         }
 
         resultDiv.innerHTML = `
@@ -217,18 +211,18 @@ document.getElementById("predictBtn").addEventListener("click", async () => {
         `;
     } catch (error) {
         console.error(error);
-        resultDiv.style.backgroundColor = "#f8d7da"; // crveno za grešku
+        resultDiv.style.backgroundColor = "#f8d7da"; 
         resultDiv.innerText = lang === "bs" ? "Greška prilikom predikcije." : "Error predicting.";
     }
 });
 
 
-// --- ADD DATA ---
+
 document.getElementById("addBtn").addEventListener("click", async () => {
     const addResultDiv = document.getElementById("addResult");
     const lang = languageSelect.value;
 
-    // Prikupljanje inputa
+
     const data = {
         age: document.getElementById("add_age").value,
         sex: document.getElementById("add_sex").value,
@@ -245,17 +239,17 @@ document.getElementById("addBtn").addEventListener("click", async () => {
         thal: document.getElementById("add_thal").value
     };
 
-    // Provjera da li su sva obavezna polja popunjena
+
     for (const key in data) {
         if (data[key] === "" || data[key] === null || data[key] === undefined) {
             addResultDiv.style.backgroundColor = "#ffcccc";
             addResultDiv.innerText = lang === "bs" ? "Molimo popunite sva polja." : "Please fill in all required fields.";
             addResultDiv.classList.remove("hide");
-            return; // prekida slanje zahtjeva
+            return; 
         }
     }
 
-    // Ako je sve popunjeno, nastavlja se sa slanjem
+    
     try {
         const response = await fetch("http://127.0.0.1:5000/add", {
             method: "POST",
@@ -274,7 +268,7 @@ document.getElementById("addBtn").addEventListener("click", async () => {
         }
 
         addResultDiv.classList.remove("hide");
-        // Nestaje nakon 5 sekundi
+        
         setTimeout(() => { addResultDiv.classList.add("hide"); }, 5000);
 
     } catch (error) {
@@ -288,15 +282,12 @@ document.getElementById("addBtn").addEventListener("click", async () => {
 
 
 
-
-// --- RETRAIN MODEL ---
-// --- RETRAIN MODEL ---
 document.getElementById("retrainBtn").addEventListener("click", async () => {
     const lang = languageSelect.value;
     const retrainDiv = document.getElementById("retrainResult");
     const addResultDiv = document.getElementById("addResult");
 
-    // Fade-out poruke dodavanja pacijenta
+    
     addResultDiv.classList.add("hide");
 
     retrainDiv.classList.remove("success", "error", "hide");
@@ -329,18 +320,17 @@ document.getElementById("retrainBtn").addEventListener("click", async () => {
 
 
 
-// --- DEFAULT EXAMPLE ON LOAD ---
 document.addEventListener("DOMContentLoaded", () => {
-    // Primjer: mlada osoba (23 godine)
+
     document.getElementById("age").value = 23;
-    document.getElementById("sex").value = "0"; // Female
+    document.getElementById("sex").value = "0"; 
     document.getElementById("cp").value = "non-anginal";
     document.getElementById("trestbps").value = 110;
     document.getElementById("chol").value = 170;
-    document.getElementById("fbs").value = "0"; // No
+    document.getElementById("fbs").value = "0"; 
     document.getElementById("restecg").value = "normal";
     document.getElementById("thalach").value = 190;
-    document.getElementById("exang").value = "0"; // No
+    document.getElementById("exang").value = "0"; 
     document.getElementById("oldpeak").value = 0;
     document.getElementById("slope").value = "upsloping";
     document.getElementById("ca").value = 0;
