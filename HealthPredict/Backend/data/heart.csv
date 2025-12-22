@@ -925,3 +925,4 @@ id,age,sex,dataset,cp,trestbps,chol,fbs,restecg,thalch,exang,oldpeak,slope,ca,th
 924,78.0,0,new,atypical angina,145.0,177.0,1,lv hypertrophy,88.0,1,2.0,flat,2.0,reversable defect,0
 925,77.0,1,new,typical angina,45.0,345.0,1,normal,354.0,0,34.0,flat,3.0,reversable defect,0
 926,52.0,1.0,new,atypical angina,124.0,164.0,1.0,lv hypertrophy,88.0,1.0,1.0,upsloping,2.0,normal,0
+927,55,1,new,typical angina,123,167,1,normal,88,1,2,flat,1,normal,0

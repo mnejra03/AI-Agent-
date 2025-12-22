@@ -1,30 +1,35 @@
-# data_processing.py
 import pandas as pd
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from sklearn.impute import SimpleImputer
+
 
 def load_data(path="data/heart.csv"):
-    df = pd.read_csv(path)
-    return df
+    return pd.read_csv(path)
+
 
 def preprocess(df):
-    df = df.dropna()
+    df = df.dropna(how="all")
 
-    df["target"] = df["num"].apply(lambda x: 1 if x > 0 else 0)
+    if "target" not in df.columns:
+        df["target"] = df["num"].apply(lambda x: 1 if x > 0 else 0)
+
     y = df["target"]
+    X = df.drop(columns=["target", "num", "id", "dataset"], errors="ignore")
 
-    X = df.drop(["num", "target", "id", "dataset"], axis=1)
+    numeric_cols = X.select_dtypes(include=["int64", "float64"]).columns
+    cat_cols = X.select_dtypes(include=["object"]).columns
 
-    X["sex"] = X["sex"].map({"Male":1, "Female":0})
-    X["fbs"] = X["fbs"].map({True:1, False:0})
-    X["exang"] = X["exang"].map({True:1, False:0})
+    imputer = SimpleImputer(strategy="mean")
+    X_numeric = pd.DataFrame(
+        imputer.fit_transform(X[numeric_cols]),
+        columns=numeric_cols
+    )
 
-    X = pd.get_dummies(X, columns=["cp","restecg","slope","thal"], drop_first=True)
+    X_cat = pd.get_dummies(X[cat_cols], drop_first=True)
+
+    X_processed = pd.concat([X_numeric, X_cat], axis=1)
 
     scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X)
+    X_scaled = scaler.fit_transform(X_processed)
 
-    return X_scaled, y, scaler, X.columns.tolist()
-
-def split_data(X, y, test_size=0.2, random_state=42):
-    return train_test_split(X, y, test_size=test_size, random_state=random_state)
+    return X_scaled, y, scaler, X_processed.columns.tolist()

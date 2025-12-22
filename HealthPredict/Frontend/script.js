@@ -21,7 +21,7 @@ const translations = {
         ca: "CA",
         thal: "Thal",
         predict_btn: "Predvidi rizik",
-        add_patient_title: "Dodaj nvog pacijenta",
+        add_patient_title: "Dodaj novog pacijenta",
         add_patient_btn: "Dodaj pacijenta",
         retrain_title: "Retreniraj model",
         retrain_text: "Koristi novododate podatke za ponovno treniranje ML modela",
@@ -183,37 +183,56 @@ document.getElementById("predictBtn").addEventListener("click", async () => {
     };
 
     try {
-        const response = await fetch("http://127.0.0.1:5000/predict", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
-        });
-        const result = await response.json();
+    const response = await fetch("http://127.0.0.1:5000/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    });
 
-        if (result.result.prediction) {
-            resultDiv.style.backgroundColor = "#ffcccc"; 
-        } else {
-            resultDiv.style.backgroundColor = "#ccffcc"; 
-        }
+    const result = await response.json();
 
-        resultDiv.innerHTML = `
-            <strong>${translations[lang].predict_title}:</strong> ${result.result.prediction ? (lang === "bs" ? "Visok rizik" : "High Risk") : (lang === "bs" ? "Nizak rizik" : "Low Risk")}<br>
-            <strong>${lang === "bs" ? "Vjerovatnoća: " : "Probability"}:</strong> ${(result.result.probability * 100).toFixed(2)}%<br>
-            <strong>${lang === "bs" ? "Najutjecajnije karakteristike" : "Top features"}:</strong>
-            ${result.top_features
-                .filter(f => featureLabels[lang][f[0]] !== null)
-                .filter(f => f[0] !== "id")
-                .map(f => `${featureLabels[lang][f[0]] || f[0]} (${(f[1] * 100).toFixed(1)}%)`)
-                .join(", ")
-            }
-
-
-        `;
-    } catch (error) {
-        console.error(error);
-        resultDiv.style.backgroundColor = "#f8d7da"; 
-        resultDiv.innerText = lang === "bs" ? "Greška prilikom predikcije." : "Error predicting.";
+    // boje po agent odluci
+    if (result.decision === "HIGH_RISK") {
+        resultDiv.style.backgroundColor = "#ffcccc";
+    } else if (result.decision === "LOW_RISK") {
+        resultDiv.style.backgroundColor = "#ccffcc";
+    } else {
+        resultDiv.style.backgroundColor = "#fff3cd"; // needs review
     }
+
+    resultDiv.innerHTML = `
+        <strong>${translations[lang].predict_title}:</strong>
+        ${
+            result.decision === "HIGH_RISK"
+                ? (lang === "bs" ? "Visok rizik" : "High Risk")
+                : result.decision === "LOW_RISK"
+                ? (lang === "bs" ? "Nizak rizik" : "Low Risk")
+                : (lang === "bs" ? "Potrebna dodatna provjera" : "Needs further review")
+        }
+        <br>
+
+        <strong>${lang === "bs" ? "Vjerovatnoća" : "Probability"}:</strong>
+        ${(result.risk * 100).toFixed(2)}%
+        <br>
+
+        <strong>${lang === "bs" ? "Najutjecajnije karakteristike" : "Top features"}:</strong>
+        ${
+            result.top_features
+                .filter(f => featureLabels[lang][f[0]] !== null)
+                .map(f =>
+                    `${featureLabels[lang][f[0]] || f[0]} (${(f[1] * 100).toFixed(1)}%)`
+                )
+                .join(", ")
+        }
+    `;
+} catch (error) {
+    console.error(error);
+    resultDiv.style.backgroundColor = "#f8d7da";
+    resultDiv.innerText = lang === "bs"
+        ? "Greška prilikom predikcije."
+        : "Error predicting.";
+}
+
 });
 
 
@@ -240,14 +259,14 @@ document.getElementById("addBtn").addEventListener("click", async () => {
     };
 
 
-    for (const key in data) {
+    /*for (const key in data) {
         if (data[key] === "" || data[key] === null || data[key] === undefined) {
             addResultDiv.style.backgroundColor = "#ffcccc";
             addResultDiv.innerText = lang === "bs" ? "Molimo popunite sva polja." : "Please fill in all required fields.";
             addResultDiv.classList.remove("hide");
             return; 
         }
-    }
+    }*/
 
     
     try {
