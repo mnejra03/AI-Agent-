@@ -18,7 +18,8 @@ HealthPredict is a web-based AI application designed to predict the risk of hear
 ## ⚙️ Running the Project
 ```bash
       python -m venv venv
-      .\venv\Scripts\activate
+      cd .\Backend\
+      .\venv\Scripts\Activate.ps1
       pip install -r requirements.txt
       python api.py
 ```
