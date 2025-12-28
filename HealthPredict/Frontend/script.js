@@ -12,7 +12,7 @@ const translations = {
         cp: "Tip angine",
         trestbps: "Krvni pritisak u mirovanju",
         chol: "Holesterol",
-        fbs: "Šećer u krvi na prazan stomak",
+        fbs: "Šećeeer u krvi na prazan stomak",
         restecg: "EKG u mirovanju",
         thalach: "Maksimalni puls",
         exang: "Angina izazvana vježbom",
