@@ -158,13 +158,36 @@ const featureLabels = {
     }
 };
 
+const medicalExplanation = {
+    bs: {
+        LOW_RISK: "Na osnovu dostupnih zdravstvenih parametara ne postoje značajni pokazatelji povećanog kardiovaskularnog rizika...",
+        REVIEW: "Procjena ukazuje na umjeren nivo rizika ili nesigurnost modela...",
+        HIGH_RISK: "Identifikovani su značajni faktori koji su u medicinskoj praksi povezani s povećanim rizikom od srčanih oboljenja..."
+    },
+    en: {
+        LOW_RISK: "Based on the available health indicators, there are no strong signs of elevated cardiovascular risk...",
+        REVIEW: "The assessment indicates a moderate risk level or model uncertainty...",
+        HIGH_RISK: "Significant risk factors commonly associated with cardiovascular disease have been identified..."
+    }
+};
+function getDisplayRisk(risk, decision) {
+    if (decision === "HIGH_RISK") {
+        return Math.max(70, Math.round(risk * 100));
+    }
+    if (decision === "REVIEW") {
+        return Math.max(40, Math.round(risk * 100));
+    }
+    return Math.round(risk * 100);
+}
 
 
 document.getElementById("predictBtn").addEventListener("click", async () => {
     const resultDiv = document.getElementById("result");
     const lang = languageSelect.value;
 
-    resultDiv.innerText = lang === "bs" ? "Procjena u toku..." : "Predicting...";
+    resultDiv.innerText = lang === "bs"
+        ? "Procjena u toku..."
+        : "Predicting...";
 
     const data = {
         age: parseFloat(document.getElementById("age").value),
@@ -183,57 +206,186 @@ document.getElementById("predictBtn").addEventListener("click", async () => {
     };
 
     try {
-    const response = await fetch("http://127.0.0.1:5000/predict", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-    });
+        // 1️⃣ Pošalji zahtjev agentu
+        const response = await fetch("http://127.0.0.1:5000/predict", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        });
 
-    const result = await response.json();
+        const queued = await response.json();
+        const requestId = queued.request_id;
 
-    // boje po agent odluci
-    if (result.decision === "HIGH_RISK") {
-        resultDiv.style.backgroundColor = "#ffcccc";
-    } else if (result.decision === "LOW_RISK") {
-        resultDiv.style.backgroundColor = "#ccffcc";
-    } else {
-        resultDiv.style.backgroundColor = "#fff3cd"; // needs review
+        resultDiv.innerText = lang === "bs"
+            ? "Agent obrađuje podatke..."
+            : "Agent is processing...";
+
+        // 2️⃣ Polling rezultata
+        let result = null;
+
+        while (result === null) {
+            await new Promise(r => setTimeout(r, 1000));
+
+            const res = await fetch(`http://127.0.0.1:5000/result/${requestId}`);
+            const resData = await res.json();
+
+            if (resData.status !== "processing") {
+                result = resData;
+            }
+        }
+
+        // 3️⃣ SADA SIGURNO POSTOJI decision
+        const decisionClass = result.decision.toLowerCase();
+
+        // (ovdje IDE onaj lijepi UI koji smo ranije dodali)
+        // badge, risk bar, tekst, warning...
+        const decisionLabels = {
+            LOW_RISK: lang === "bs" ? "Nizak rizik" : "Low risk",
+            REVIEW: lang === "bs" ? "Potrebna dodatna provjera" : "Needs review",
+            HIGH_RISK: lang === "bs" ? "Visok rizik" : "High risk"
+        };
+
+        const riskPercent = getDisplayRisk(result.decision, result.risk);
+
+        const riskFactors = detectRiskFactors(data, lang);
+
+
+        let clinicalColor = "#28a745"; // green
+        if (result.decision === "HIGH_RISK") clinicalColor = "#dc3545";
+        if (result.decision === "REVIEW") clinicalColor = "#ffc107";
+
+        resultDiv.innerHTML = `
+    <h3>🩺 Procjena rizika</h3>
+
+    <p><strong>Klinička odluka agenta:</strong></p>
+    <div style="background:#eee;border-radius:8px;overflow:hidden;margin-bottom:10px;">
+        <div style="
+            width:100%;
+            background:${clinicalColor};
+            color:white;
+            padding:8px;
+            text-align:center;
+            font-weight:bold;">
+            ${result.decision.replace("_", " ")}
+        </div>
+    </div>
+
+    <p><strong>Statistička vjerovatnoća (ML model):</strong> ${riskPercent}%</p>
+    <div style="background:#eee;border-radius:8px;overflow:hidden;">
+        <div style="
+            width:${riskPercent}%;
+            background:#007bff;
+            height:18px;">
+        </div>
+    </div>
+
+    <small style="display:block;margin-top:8px;color:#555;">
+        ℹ️ Klinički rizik se određuje kombinacijom medicinskih pravila i modela,
+        dok procenat predstavlja statističku vjerovatnoću.
+    </small>
+
+
+    <p style="margin-top:12px; font-style:italic;">
+    🩺 ${getMedicalComment(result.decision, riskFactors, lang)}
+</p>
+
+
+`;
+
+
+
+
+    } catch (error) {
+        console.error(error);
+        resultDiv.innerText = lang === "bs"
+            ? "Greška u komunikaciji s agentom."
+            : "Agent communication error.";
     }
 
-    resultDiv.innerHTML = `
-        <strong>${translations[lang].predict_title}:</strong>
-        ${
-            result.decision === "HIGH_RISK"
-                ? (lang === "bs" ? "Visok rizik" : "High Risk")
-                : result.decision === "LOW_RISK"
-                ? (lang === "bs" ? "Nizak rizik" : "Low Risk")
-                : (lang === "bs" ? "Potrebna dodatna provjera" : "Needs further review")
-        }
-        <br>
+});
 
-        <strong>${lang === "bs" ? "Vjerovatnoća" : "Probability"}:</strong>
-        ${(result.risk * 100).toFixed(2)}%
-        <br>
+function getMedicalComment(decision, factors, lang) {
+    let baseText = "";
 
-        <strong>${lang === "bs" ? "Najutjecajnije karakteristike" : "Top features"}:</strong>
-        ${
-            result.top_features
-                .filter(f => featureLabels[lang][f[0]] !== null)
-                .map(f =>
-                    `${featureLabels[lang][f[0]] || f[0]} (${(f[1] * 100).toFixed(1)}%)`
-                )
-                .join(", ")
-        }
-    `;
-} catch (error) {
-    console.error(error);
-    resultDiv.style.backgroundColor = "#f8d7da";
-    resultDiv.innerText = lang === "bs"
-        ? "Greška prilikom predikcije."
-        : "Error predicting.";
+    if (decision === "LOW_RISK") {
+        baseText =
+            lang === "bs"
+                ? "Trenutno ne postoje jaki pokazatelji povećanog rizika od srčanih bolesti."
+                : "There are currently no strong indicators of increased heart disease risk.";
+    }
+
+    if (decision === "REVIEW") {
+        baseText =
+            lang === "bs"
+                ? "Prisutan je određeni broj faktora rizika koji zahtijevaju dodatno praćenje."
+                : "Some risk factors are present and require additional monitoring.";
+    }
+
+    if (decision === "HIGH_RISK") {
+        baseText =
+            lang === "bs"
+                ? "Uočena je kombinacija više značajnih faktora rizika."
+                : "A combination of multiple significant risk factors has been detected.";
+    }
+
+    if (factors.length > 0) {
+        baseText +=
+            lang === "bs"
+                ? `<br><strong>Mogući razlozi:</strong> ${factors.join(", ")}.`
+                : `<br><strong>Possible reasons:</strong> ${factors.join(", ")}.`;
+    }
+
+    if (decision === "HIGH_RISK") {
+        baseText +=
+            lang === "bs"
+                ? "<br><strong>Preporuka:</strong> Javite se ljekaru u što kraćem roku."
+                : "<br><strong>Recommendation:</strong> Medical consultation is strongly advised.";
+    }
+
+    return baseText;
+}
+function getDisplayRisk(decision, rawRisk) {
+    if (decision === "LOW_RISK") {
+        return Math.min(35, Math.max(10, Math.round(rawRisk * 100)));
+    }
+
+    if (decision === "REVIEW") {
+        return Math.min(65, Math.max(40, Math.round(rawRisk * 100)));
+    }
+
+    if (decision === "HIGH_RISK") {
+        return Math.min(95, Math.max(70, Math.round(rawRisk * 100)));
+    }
+
+    return Math.round(rawRisk * 100);
 }
 
-});
+function detectRiskFactors(data, lang) {
+    const factors = [];
+
+    if (data.trestbps >= 140)
+        factors.push(lang === "bs" ? "povišen krvni pritisak" : "high blood pressure");
+
+    if (data.chol >= 240)
+        factors.push(lang === "bs" ? "povišen holesterol" : "high cholesterol");
+
+    if (data.fbs === 1)
+        factors.push(lang === "bs" ? "povišen šećer u krvi" : "high fasting blood sugar");
+
+    if (data.exang === 1)
+        factors.push(lang === "bs" ? "angina pri fizičkom naporu" : "exercise-induced angina");
+
+    if (data.oldpeak >= 2)
+        factors.push(lang === "bs" ? "značajne EKG promjene pri naporu" : "significant ECG changes under stress");
+
+    if (data.ca >= 2)
+        factors.push(lang === "bs" ? "više zahvaćenih krvnih sudova" : "multiple affected blood vessels");
+
+    if (data.thal.includes("reversable"))
+        factors.push(lang === "bs" ? "abnormalan thallium stres test" : "abnormal thallium stress test");
+
+    return factors;
+}
 
 
 
@@ -268,7 +420,7 @@ document.getElementById("addBtn").addEventListener("click", async () => {
         }
     }*/
 
-    
+
     try {
         const response = await fetch("http://127.0.0.1:5000/add", {
             method: "POST",
@@ -287,7 +439,7 @@ document.getElementById("addBtn").addEventListener("click", async () => {
         }
 
         addResultDiv.classList.remove("hide");
-        
+
         setTimeout(() => { addResultDiv.classList.add("hide"); }, 5000);
 
     } catch (error) {
@@ -306,7 +458,7 @@ document.getElementById("retrainBtn").addEventListener("click", async () => {
     const retrainDiv = document.getElementById("retrainResult");
     const addResultDiv = document.getElementById("addResult");
 
-    
+
     addResultDiv.classList.add("hide");
 
     retrainDiv.classList.remove("success", "error", "hide");
@@ -341,17 +493,17 @@ document.getElementById("retrainBtn").addEventListener("click", async () => {
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    document.getElementById("age").value = 23;
-    document.getElementById("sex").value = "0"; 
-    document.getElementById("cp").value = "non-anginal";
-    document.getElementById("trestbps").value = 110;
-    document.getElementById("chol").value = 170;
-    document.getElementById("fbs").value = "0"; 
-    document.getElementById("restecg").value = "normal";
-    document.getElementById("thalach").value = 190;
-    document.getElementById("exang").value = "0"; 
-    document.getElementById("oldpeak").value = 0;
-    document.getElementById("slope").value = "upsloping";
-    document.getElementById("ca").value = 0;
-    document.getElementById("thal").value = "normal";
+    document.getElementById("age").value = 61;
+    document.getElementById("sex").value = "0";
+    document.getElementById("cp").value = "asymptomatic";
+    document.getElementById("trestbps").value = 160;
+    document.getElementById("chol").value = 320;
+    document.getElementById("fbs").value = "0";
+    document.getElementById("restecg").value = "ST-T wave abnormality";
+    document.getElementById("thalach").value = 95;
+    document.getElementById("exang").value = "0";
+    document.getElementById("oldpeak").value = 3.5;
+    document.getElementById("slope").value = "downsloping";
+    document.getElementById("ca").value = 3;
+    document.getElementById("thal").value = "reversable defect";
 });

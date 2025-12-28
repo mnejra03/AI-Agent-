@@ -1,63 +1,31 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import os
-import pandas as pd
+from threading import Thread
 
-from model_utils import load_model, get_feature_importance
-from data_processing import load_data
-from health_agent import HealthRiskAgent
+from agent_runtime import add_request, get_result
+from agent_runner import agent_loop
 
 app = Flask(__name__)
 CORS(app)
 
-model, scaler, features = load_model()
-agent = HealthRiskAgent(model, scaler, features)
+# ---------- START AGENT ----------
+runner_thread = Thread(target=agent_loop, daemon=True)
+runner_thread.start()
 
-
+# ---------- ENDPOINTS ----------
 @app.route("/predict", methods=["POST"])
-def predict():
+def predict_endpoint():
     data = request.json
+    request_id = add_request(data)
+    return jsonify({"request_id": request_id, "status": "queued"})
 
-    percept = agent.sense(data)
-    risk = agent.think(percept)
-    decision = agent.act(risk)
-    review = agent.needs_human_review(risk)
+@app.route("/result/<request_id>")
+def get_prediction_result(request_id):
+    result = get_result(request_id)
+    if result is None:
+        return jsonify({"status": "processing"})
+    return jsonify(result)
 
-    top = get_feature_importance(model, features)[:5]
-
-    return jsonify({
-        "risk": risk,
-        "decision": decision,
-        "needs_review": review,
-        "top_features": top
-    })
-
-
-@app.route("/add", methods=["POST"])
-def add_data():
-    df = load_data()
-    data = request.json
-
-    data.setdefault("id", len(df) + 1)
-    data.setdefault("dataset", "new")
-    data.setdefault("num", 0)
-
-    df = pd.concat([df, pd.DataFrame([data])], ignore_index=True)
-    df.to_csv("data/heart.csv", index=False)
-
-    return jsonify({"status": "success"})
-
-
-@app.route("/retrain", methods=["POST"])
-def retrain():
-    os.system("python train_model.py")
-
-    global model, scaler, features, agent
-    model, scaler, features = load_model()
-    agent = HealthRiskAgent(model, scaler, features)
-
-    return jsonify({"status": "model retrained"})
-
-
+# ---------- RUN ----------
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, use_reloader=False)
