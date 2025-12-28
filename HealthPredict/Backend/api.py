@@ -19,6 +19,7 @@ def predict_endpoint():
     request_id = add_request(data)
     return jsonify({"request_id": request_id, "status": "queued"})
 
+
 @app.route("/result/<request_id>")
 def get_prediction_result(request_id):
     result = get_result(request_id)
