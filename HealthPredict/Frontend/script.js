@@ -411,14 +411,17 @@ document.getElementById("addBtn").addEventListener("click", async () => {
     };
 
 
-    /*for (const key in data) {
+    for (const key in data) {
         if (data[key] === "" || data[key] === null || data[key] === undefined) {
             addResultDiv.style.backgroundColor = "#ffcccc";
-            addResultDiv.innerText = lang === "bs" ? "Molimo popunite sva polja." : "Please fill in all required fields.";
+            addResultDiv.innerText = lang === "bs"
+                ? "Molimo popunite sva polja prije dodavanja pacijenta."
+                : "Please fill in all fields before adding a patient.";
             addResultDiv.classList.remove("hide");
-            return; 
+            return; // ⛔ STOP
         }
-    }*/
+    }
+
 
 
     try {
@@ -432,11 +435,19 @@ document.getElementById("addBtn").addEventListener("click", async () => {
 
         if (result.status === "success") {
             addResultDiv.style.backgroundColor = "#ccffcc";
-            addResultDiv.innerText = lang === "bs" ? "Pacijent uspješno dodan." : "Patient added successfully.";
-        } else {
-            addResultDiv.style.backgroundColor = "#ffcccc";
-            addResultDiv.innerText = lang === "bs" ? "Dodavanje pacijenta nije uspjelo." : "Failed to add patient.";
+            addResultDiv.innerHTML = lang === "bs"
+                ? `
+            <strong>Pacijent uspješno dodan.</strong><br>
+            ⚠️ <em>Za ažuriranje predikcija potrebno je pokrenuti ponovno treniranje modela.</em>
+          `
+                : `
+            <strong>Patient successfully added.</strong><br>
+            ⚠️ <em>To update predictions, model retraining is required.</em>
+          `;
         }
+        document.getElementById("retrainBtn").style.border = "2px solid orange";
+        document.getElementById("retrainBtn").scrollIntoView({ behavior: "smooth" });
+
 
         addResultDiv.classList.remove("hide");
 
@@ -454,40 +465,49 @@ document.getElementById("addBtn").addEventListener("click", async () => {
 
 
 document.getElementById("retrainBtn").addEventListener("click", async () => {
-    const lang = languageSelect.value;
     const retrainDiv = document.getElementById("retrainResult");
-    const addResultDiv = document.getElementById("addResult");
+    const lang = languageSelect.value;
 
-
-    addResultDiv.classList.add("hide");
-
-    retrainDiv.classList.remove("success", "error", "hide");
+    // 1️⃣ PORUKA ODMAH (dok traje retrain)
     retrainDiv.style.display = "block";
-    retrainDiv.style.opacity = 1;
-    retrainDiv.style.color = "green";
-    retrainDiv.innerText = lang === "bs" ? "Ponovno treniranje modela, molimo sačekajte..." : "Retraining model, please wait...";
+    retrainDiv.style.backgroundColor = "#fff3cd";
+    retrainDiv.innerText =
+        lang === "bs"
+            ? "Ponovno treniranje modela, molimo sačekajte..."
+            : "Retraining model, please wait...";
 
     try {
-        const response = await fetch("http://127.0.0.1:5000/retrain", { method: "POST" });
+        const response = await fetch("http://127.0.0.1:5000/retrain", {
+            method: "POST"
+        });
+
         const result = await response.json();
 
-        retrainDiv.classList.remove("hide");
-
-        if (result.status.toLowerCase() === "success") {
-            retrainDiv.classList.add("success");
-            retrainDiv.innerText = lang === "bs" ? result.message_bs : result.message_en;
+        // 2️⃣ NAKON ZAVRŠETKA
+        if (result.status === "success") {
+            retrainDiv.style.backgroundColor = "#ccffcc";
+            retrainDiv.innerText =
+                lang === "bs"
+                    ? result.message_bs
+                    : result.message_en;
         } else {
-            retrainDiv.classList.add("error");
-            retrainDiv.innerText = lang === "bs" ? (result.message_bs || "Greška prilikom retreniranja modela.")
-                : (result.message_en || "Error retraining model.");
+            retrainDiv.style.backgroundColor = "#ffcccc";
+            retrainDiv.innerText =
+                lang === "bs"
+                    ? "Greška prilikom retreniranja."
+                    : "Retraining failed.";
         }
 
     } catch (error) {
-        retrainDiv.classList.remove("hide");
-        retrainDiv.classList.add("error");
-        retrainDiv.innerText = lang === "bs" ? "Greška prilikom retreniranja modela." : "Error retraining model. Check backend.";
+        retrainDiv.style.backgroundColor = "#ffcccc";
+        retrainDiv.innerText =
+            lang === "bs"
+                ? "Greška – backend nije dostupan."
+                : "Error – backend not reachable.";
     }
 });
+
+
 
 
 

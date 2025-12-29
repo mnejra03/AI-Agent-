@@ -163,18 +163,18 @@ button:hover {
     transition: opacity 0.5s ease;
     display: block;          /* osiguraj da bude prikazano */
 }
-
+/*
 .result.hide {
     opacity: 0;
     display: none;           /* nakon fade-outa potpuno nestane */
-}
+
 
 #retrainResult {
     margin-top: 20px;
     padding: 20px;
     border-radius: 12px;
     font-size: 16px;
-    color: #fff;
+    color: #2c9400;
     display: none; /* po defaultu skriveno */
     opacity: 1;
     transition: opacity 0.5s ease;
@@ -186,7 +186,7 @@ button:hover {
 }
 
 #retrainResult.error {
-    background-color: #f4ddda; /* tamno crvena */
+    background-color: #f3c2bc; /* tamno crvena */
     display: block;
 }
 
@@ -298,4 +298,40 @@ select:focus + .hint {
     background: #fff3cd;
     border-left: 4px solid #ffc107;
     font-size: 0.9em;
+}
+.risk-box {
+  padding: 20px;
+  border-radius: 12px;
+  margin-top: 15px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+.risk-box h3 {
+  margin-top: 0;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.risk-box.low {
+  background: #e9f7ef;
+  border-left: 6px solid #2ecc71;
+  color: #1e8449;
+}
+
+.risk-box.review {
+  background: #fff8e1;
+  border-left: 6px solid #f1c40f;
+  color: #7d6608;
+}
+
+.risk-box.high {
+  background: #fdecea;
+  border-left: 6px solid #e74c3c;
+  color: #922b21;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
