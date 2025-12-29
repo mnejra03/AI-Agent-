@@ -109,6 +109,7 @@ function updateLanguage(lang) {
                 el.innerText = translations[lang][key];
             }
         }
+        if (el.dataset.ignoreI18n === "true") return;
     });
 
     document.querySelectorAll("select option[data-i18n]").forEach(opt => {
@@ -119,10 +120,8 @@ function updateLanguage(lang) {
     });
 }
 
-
 updateLanguage(languageSelect.value);
 languageSelect.addEventListener("change", () => updateLanguage(languageSelect.value));
-
 
 const featureLabels = {
     bs: {
@@ -170,6 +169,7 @@ const medicalExplanation = {
         HIGH_RISK: "Significant risk factors commonly associated with cardiovascular disease have been identified..."
     }
 };
+
 function getDisplayRisk(risk, decision) {
     if (decision === "HIGH_RISK") {
         return Math.max(70, Math.round(risk * 100));
@@ -206,7 +206,6 @@ document.getElementById("predictBtn").addEventListener("click", async () => {
     };
 
     try {
-        // 1️⃣ Pošalji zahtjev agentu
         const response = await fetch("http://127.0.0.1:5000/predict", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -220,7 +219,6 @@ document.getElementById("predictBtn").addEventListener("click", async () => {
             ? "Agent obrađuje podatke..."
             : "Agent is processing...";
 
-        // 2️⃣ Polling rezultata
         let result = null;
 
         while (result === null) {
@@ -234,15 +232,12 @@ document.getElementById("predictBtn").addEventListener("click", async () => {
             }
         }
 
-        // 3️⃣ SADA SIGURNO POSTOJI decision
         const decisionClass = result.decision.toLowerCase();
 
-        // (ovdje IDE onaj lijepi UI koji smo ranije dodali)
-        // badge, risk bar, tekst, warning...
         const decisionLabels = {
-            LOW_RISK: lang === "bs" ? "Nizak rizik" : "Low risk",
+            LOW_RISK: lang === "bs" ? "NIZAK RIZIK" : "LOW RISK",
             REVIEW: lang === "bs" ? "Potrebna dodatna provjera" : "Needs review",
-            HIGH_RISK: lang === "bs" ? "Visok rizik" : "High risk"
+            HIGH_RISK: lang === "bs" ? "VISOK RIZIK" : "HIGH RISK"
         };
 
         const riskPercent = getDisplayRisk(result.decision, result.risk);
@@ -250,14 +245,16 @@ document.getElementById("predictBtn").addEventListener("click", async () => {
         const riskFactors = detectRiskFactors(data, lang);
 
 
-        let clinicalColor = "#28a745"; // green
+        let clinicalColor = "#28a745";
         if (result.decision === "HIGH_RISK") clinicalColor = "#dc3545";
-        if (result.decision === "REVIEW") clinicalColor = "#ffc107";
+        if (result.decision === "REVIEW") clinicalColor = "#007bff";
 
         resultDiv.innerHTML = `
-    <h3>🩺 Procjena rizika</h3>
+    <h3>🩺 ${lang === "bs" ? "Procjena rizika" : "Risk Assessment"}</h3>
 
-    <p><strong>Klinička odluka agenta:</strong></p>
+    <p><strong>
+        ${lang === "bs" ? "Klinička odluka agenta:" : "Agent clinical decision:"}
+    </strong></p>
     <div style="background:#eee;border-radius:8px;overflow:hidden;margin-bottom:10px;">
         <div style="
             width:100%;
@@ -266,11 +263,18 @@ document.getElementById("predictBtn").addEventListener("click", async () => {
             padding:8px;
             text-align:center;
             font-weight:bold;">
-            ${result.decision.replace("_", " ")}
+            ${decisionLabels[result.decision]}
         </div>
     </div>
 
-    <p><strong>Statistička vjerovatnoća (ML model):</strong> ${riskPercent}%</p>
+    <p>
+        <strong>
+            ${lang === "bs"
+                ? "Statistička vjerovatnoća (ML model):"
+                : "Statistical probability (ML model):"}
+        </strong>
+        ${riskPercent}%
+    </p>
     <div style="background:#eee;border-radius:8px;overflow:hidden;">
         <div style="
             width:${riskPercent}%;
@@ -280,20 +284,17 @@ document.getElementById("predictBtn").addEventListener("click", async () => {
     </div>
 
     <small style="display:block;margin-top:8px;color:#555;">
-        ℹ️ Klinički rizik se određuje kombinacijom medicinskih pravila i modela,
-        dok procenat predstavlja statističku vjerovatnoću.
+        ℹ️ ${
+            lang === "bs"
+                ? "Klinički rizik se određuje kombinacijom medicinskih pravila i modela, dok procenat predstavlja statističku vjerovatnoću."
+                : "Clinical risk is determined using a combination of medical rules and the model, while the percentage represents statistical probability."
+        }
     </small>
 
 
     <p style="margin-top:12px; font-style:italic;">
     🩺 ${getMedicalComment(result.decision, riskFactors, lang)}
-</p>
-
-
-`;
-
-
-
+</p>`;
 
     } catch (error) {
         console.error(error);
@@ -310,40 +311,48 @@ function getMedicalComment(decision, factors, lang) {
     if (decision === "LOW_RISK") {
         baseText =
             lang === "bs"
-                ? "Trenutno ne postoje jaki pokazatelji povećanog rizika od srčanih bolesti."
-                : "There are currently no strong indicators of increased heart disease risk.";
+                ? "Na osnovu dostupnih podataka, trenutno nema značajnih pokazatelja povišenog kardiovaskularnog rizika."
+                : "Based on the available data, there are no significant indicators of elevated cardiovascular risk.";
     }
 
     if (decision === "REVIEW") {
         baseText =
             lang === "bs"
-                ? "Prisutan je određeni broj faktora rizika koji zahtijevaju dodatno praćenje."
-                : "Some risk factors are present and require additional monitoring.";
+                ? "Prisutan je umjeren nivo rizika. Neki faktori zahtijevaju dodatno praćenje i oprez."
+                : "A moderate level of risk is present. Certain factors require closer monitoring and caution.";
     }
 
     if (decision === "HIGH_RISK") {
         baseText =
             lang === "bs"
-                ? "Uočena je kombinacija više značajnih faktora rizika."
-                : "A combination of multiple significant risk factors has been detected.";
+                ? "Uočena je kombinacija više klinički značajnih faktora koji ukazuju na povišen rizik.<br>"
+                : "A combination of multiple clinically significant factors indicates an elevated risk.<br>";
     }
 
-    if (factors.length > 0) {
+    if (factors && factors.length > 0) {
         baseText +=
             lang === "bs"
-                ? `<br><strong>Mogući razlozi:</strong> ${factors.join(", ")}.`
-                : `<br><strong>Possible reasons:</strong> ${factors.join(", ")}.`;
+                ? `<br><strong>Mogući razlozi:</strong> ${factors.join(", ")}.<br>`
+                : `<br><strong>Possible contributing factors:</strong> ${factors.join(", ")}.<br>`;
     }
 
     if (decision === "HIGH_RISK") {
         baseText +=
             lang === "bs"
-                ? "<br><strong>Preporuka:</strong> Javite se ljekaru u što kraćem roku."
-                : "<br><strong>Recommendation:</strong> Medical consultation is strongly advised.";
+                ? "<br><strong>Preporuka:</strong> Savjetuje se što skoriji pregled kod ljekara."
+                : "<br><strong>Recommendation:</strong> Prompt medical consultation is strongly recommended.";
+    }
+
+    if (decision === "REVIEW") {
+        baseText +=
+            lang === "bs"
+                ? "<br><strong>Preporuka:</strong> Nastaviti praćenje i razmotriti dodatne dijagnostičke pretrage."
+                : "<br><strong>Recommendation:</strong> Continued monitoring and additional diagnostic evaluation may be beneficial.";
     }
 
     return baseText;
 }
+
 function getDisplayRisk(decision, rawRisk) {
     if (decision === "LOW_RISK") {
         return Math.min(35, Math.max(10, Math.round(rawRisk * 100)));
@@ -386,13 +395,10 @@ function detectRiskFactors(data, lang) {
 
     return factors;
 }
-
-
-
+/*
 document.getElementById("addBtn").addEventListener("click", async () => {
     const addResultDiv = document.getElementById("addResult");
     const lang = languageSelect.value;
-
 
     const data = {
         age: document.getElementById("add_age").value,
@@ -410,7 +416,6 @@ document.getElementById("addBtn").addEventListener("click", async () => {
         thal: document.getElementById("add_thal").value
     };
 
-
     for (const key in data) {
         if (data[key] === "" || data[key] === null || data[key] === undefined) {
             addResultDiv.style.backgroundColor = "#ffcccc";
@@ -418,11 +423,9 @@ document.getElementById("addBtn").addEventListener("click", async () => {
                 ? "Molimo popunite sva polja prije dodavanja pacijenta."
                 : "Please fill in all fields before adding a patient.";
             addResultDiv.classList.remove("hide");
-            return; // ⛔ STOP
+            return;
         }
     }
-
-
 
     try {
         const response = await fetch("http://127.0.0.1:5000/add", {
@@ -451,24 +454,92 @@ document.getElementById("addBtn").addEventListener("click", async () => {
 
         addResultDiv.classList.remove("hide");
 
-        setTimeout(() => { addResultDiv.classList.add("hide"); }, 5000);
 
     } catch (error) {
         console.error(error);
         addResultDiv.style.backgroundColor = "#ffcccc";
         addResultDiv.innerText = lang === "bs" ? "Greška prilikom dodavanja pacijenta." : "Error adding patient.";
         addResultDiv.classList.remove("hide");
-        setTimeout(() => { addResultDiv.classList.add("hide"); }, 5000);
     }
 });
+*/
+document.getElementById("addBtn").addEventListener("click", async () => {
+    const addResultDiv = document.getElementById("addResult");
+    const lang = languageSelect.value;
 
+    addResultDiv.classList.remove("hide");
+    addResultDiv.style.opacity = 1;
+    addResultDiv.style.display = "block";
+
+
+    const data = {
+        age: document.getElementById("add_age").value,
+        sex: document.getElementById("add_sex").value,
+        cp: document.getElementById("add_cp").value,
+        trestbps: document.getElementById("add_trestbps").value,
+        chol: document.getElementById("add_chol").value,
+        fbs: document.getElementById("add_fbs").value,
+        restecg: document.getElementById("add_restecg").value,
+        thalch: document.getElementById("add_thalch").value,
+        exang: document.getElementById("add_exang").value,
+        oldpeak: document.getElementById("add_oldpeak").value,
+        slope: document.getElementById("add_slope").value,
+        ca: document.getElementById("add_ca").value,
+        thal: document.getElementById("add_thal").value
+    };
+
+    for (const key in data) {
+        if (!data[key]) {
+            addResultDiv.style.display = "block";
+            addResultDiv.style.backgroundColor = "#f8d7da";
+            addResultDiv.innerText =
+                lang === "bs"
+                    ? "Molimo popunite sva polja prije dodavanja pacijenta."
+                    : "Please fill in all fields before adding a patient.";
+            return;
+        }
+    }
+
+    try {
+        const response = await fetch("http://127.0.0.1:5000/add", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (result.status === "success") {
+            addResultDiv.style.backgroundColor = "#d4edda";
+            addResultDiv.innerHTML =
+                lang === "bs"
+                    ? `<strong>Pacijent uspješno dodan.</strong><br>
+                       ⚠️ <em>Za primjenu novih podataka potrebno je pokrenuti ponovno treniranje modela.</em>`
+                    : `<strong>Patient successfully added.</strong><br>
+                       ⚠️ <em>To apply new data, model retraining is required.</em>`;
+
+            // vizualni hint za retrain
+            const retrainBtn = document.getElementById("retrainBtn");
+            retrainBtn.style.border = "2px solid #fd7e14";
+            retrainBtn.scrollIntoView({ behavior: "smooth" });
+        } else {
+            throw new Error("Add failed");
+        }
+
+    } catch (error) {
+        addResultDiv.style.backgroundColor = "#f8d7da";
+        addResultDiv.innerText =
+            lang === "bs"
+                ? "Greška prilikom dodavanja pacijenta."
+                : "Error adding patient.";
+    }
+});
 
 
 document.getElementById("retrainBtn").addEventListener("click", async () => {
     const retrainDiv = document.getElementById("retrainResult");
     const lang = languageSelect.value;
 
-    // 1️⃣ PORUKA ODMAH (dok traje retrain)
     retrainDiv.style.display = "block";
     retrainDiv.style.backgroundColor = "#fff3cd";
     retrainDiv.innerText =
@@ -483,7 +554,6 @@ document.getElementById("retrainBtn").addEventListener("click", async () => {
 
         const result = await response.json();
 
-        // 2️⃣ NAKON ZAVRŠETKA
         if (result.status === "success") {
             retrainDiv.style.backgroundColor = "#ccffcc";
             retrainDiv.innerText =
@@ -506,9 +576,6 @@ document.getElementById("retrainBtn").addEventListener("click", async () => {
                 : "Error – backend not reachable.";
     }
 });
-
-
-
 
 
 document.addEventListener("DOMContentLoaded", () => {

@@ -1,7 +1,7 @@
 body {
     font-family: "Noto Serif Yezidi", serif;
-  font-optical-sizing: auto;
-  font-style: normal;
+    font-optical-sizing: auto;
+    font-style: normal;
     background: url('dna-3539309.jpg') no-repeat center center fixed;
     background-size: cover;
     margin: 0;
@@ -55,7 +55,7 @@ body {
     border: none;
     font-size: 14px;
     background: rgba(255, 255, 255, 0.1);
-    color:#e0e0e0;
+    color: #e0e0e0;
     cursor: pointer;
 }
 
@@ -159,15 +159,18 @@ button:hover {
     border-radius: 12px;
     font-size: 16px;
     color: #666;
-    opacity: 1;             /* vidljivo po defaultu */
+    opacity: 1;
+    /* vidljivo po defaultu */
     transition: opacity 0.5s ease;
-    display: block;          /* osiguraj da bude prikazano */
+    display: block;
+    /* osiguraj da bude prikazano */
 }
-/*
-.result.hide {
-    opacity: 0;
-    display: none;           /* nakon fade-outa potpuno nestane */
 
+
+.result.hide {
+    
+    display: none;           /* nakon fade-outa potpuno nestane */
+}
 
 #retrainResult {
     margin-top: 20px;
@@ -175,18 +178,21 @@ button:hover {
     border-radius: 12px;
     font-size: 16px;
     color: #2c9400;
-    display: none; /* po defaultu skriveno */
+    display: none;
+    /* po defaultu skriveno */
     opacity: 1;
     transition: opacity 0.5s ease;
 }
 
 #retrainResult.success {
-    background-color:#a9fba9;; 
+    background-color: #a9fba9;
+    ;
     display: block;
 }
 
 #retrainResult.error {
-    background-color: #f3c2bc; /* tamno crvena */
+    background-color: #f3c2bc;
+    /* tamno crvena */
     display: block;
 }
 
@@ -199,10 +205,11 @@ button:hover {
     color: #666;
 }
 
-input:focus + .hint,
-select:focus + .hint {
+input:focus+.hint,
+select:focus+.hint {
     display: block;
 }
+
 .result.prediction {
     margin-top: 25px;
     padding: 20px;
@@ -210,19 +217,23 @@ select:focus + .hint {
     font-size: 16px;
     font-weight: 500;
     text-align: center;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
 }
 
 .result.prediction.high {
-    background-color: #ffe6e6; /* svijetlo crveno */
-    color: #c0392b; /* tamnocrvena */
+    background-color: #ffe6e6;
+    /* svijetlo crveno */
+    color: #c0392b;
+    /* tamnocrvena */
     border: 1px solid #e74c3c;
 }
 
 .result.prediction.low {
-    background-color: #e6ffe6; /* svijetlo zeleno */
-    color: #27ae60; /* tamno zelena */
+    background-color: #e6ffe6;
+    /* svijetlo zeleno */
+    color: #27ae60;
+    /* tamno zelena */
     border: 1px solid #2ecc71;
 }
 
@@ -237,6 +248,7 @@ select:focus + .hint {
     font-size: 14px;
     color: #34495e;
 }
+
 .agent-decision {
     padding: 15px;
     border-radius: 10px;
@@ -258,18 +270,21 @@ select:focus + .hint {
 }
 
 .badge.LOW_RISK {
-    background: #d4edda;
-    color: #155724;
+    background: linear-gradient(135deg, #2e7d32, #1b5e20);
+    color: white;
+
 }
 
 .badge.REVIEW {
-    background: #fff3cd;
-    color: #856404;
+    background: linear-gradient(135deg, #0097a7, #006064);
+    color: white;
+
 }
 
 .badge.HIGH_RISK {
-    background: #f8d7da;
-    color: #721c24;
+    background: linear-gradient(135deg, #d32f2f, #b71c1c);
+    color: white;
+
 }
 
 .risk-bar {
@@ -283,7 +298,9 @@ select:focus + .hint {
 .risk-fill {
     height: 100%;
     border-radius: 4px;
-    background: linear-gradient(to right, #28a745, #ffc107, #dc3545);
+    background: linear-gradient(135deg, #0097a7, #006064);
+color: white;
+
 }
 
 .agent-text {
@@ -299,39 +316,47 @@ select:focus + .hint {
     border-left: 4px solid #ffc107;
     font-size: 0.9em;
 }
+
 .risk-box {
-  padding: 20px;
-  border-radius: 12px;
-  margin-top: 15px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-  animation: fadeIn 0.4s ease-in-out;
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    animation: fadeIn 0.4s ease-in-out;
 }
 
 .risk-box h3 {
-  margin-top: 0;
-  font-weight: 700;
-  letter-spacing: 1px;
+    margin-top: 0;
+    font-weight: 700;
+    letter-spacing: 1px;
 }
 
 .risk-box.low {
-  background: #e9f7ef;
-  border-left: 6px solid #2ecc71;
-  color: #1e8449;
+    background: #e9f7ef;
+    border-left: 6px solid #2ecc71;
+    color: #1e8449;
 }
 
 .risk-box.review {
-  background: #fff8e1;
-  border-left: 6px solid #f1c40f;
-  color: #7d6608;
+    background: linear-gradient(90deg, #ffcc00, #ffdd55);
+    color: #5a4300;
+    font-weight: 600;
 }
 
 .risk-box.high {
-  background: #fdecea;
-  border-left: 6px solid #e74c3c;
-  color: #922b21;
+    background: #fdecea;
+    border-left: 6px solid #e74c3c;
+    color: #922b21;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(5px); }
-  to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
