@@ -9,16 +9,13 @@ body {
     overflow-x: hidden;
 }
 
-/* HEADER */
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 20px 40px;
     background: rgba(44, 62, 80, 0.85);
-    /* blago transparentno */
     backdrop-filter: blur(10px);
-    /* stakleni efekt */
     color: #fff;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -65,7 +62,6 @@ body {
     outline: none;
 }
 
-/* FOOTER */
 .footer {
     width: 100%;
     text-align: center;
@@ -126,7 +122,6 @@ textarea {
     box-sizing: border-box;
 }
 
-
 input:focus,
 select:focus {
     outline: none;
@@ -160,16 +155,13 @@ button:hover {
     font-size: 16px;
     color: #666;
     opacity: 1;
-    /* vidljivo po defaultu */
     transition: opacity 0.5s ease;
     display: block;
-    /* osiguraj da bude prikazano */
 }
-
 
 .result.hide {
     
-    display: none;           /* nakon fade-outa potpuno nestane */
+    display: none; 
 }
 
 #retrainResult {
@@ -179,25 +171,19 @@ button:hover {
     font-size: 16px;
     color: #2c9400;
     display: none;
-    /* po defaultu skriveno */
     opacity: 1;
     transition: opacity 0.5s ease;
 }
 
 #retrainResult.success {
     background-color: #a9fba9;
-    ;
     display: block;
 }
 
 #retrainResult.error {
     background-color: #f3c2bc;
-    /* tamno crvena */
     display: block;
 }
-
-
-
 
 .hint {
     display: none;
@@ -223,17 +209,13 @@ select:focus+.hint {
 
 .result.prediction.high {
     background-color: #ffe6e6;
-    /* svijetlo crveno */
     color: #c0392b;
-    /* tamnocrvena */
     border: 1px solid #e74c3c;
 }
 
 .result.prediction.low {
     background-color: #e6ffe6;
-    /* svijetlo zeleno */
     color: #27ae60;
-    /* tamno zelena */
     border: 1px solid #2ecc71;
 }
 

@@ -12,7 +12,7 @@ const translations = {
         cp: "Tip angine",
         trestbps: "Krvni pritisak u mirovanju",
         chol: "Holesterol",
-        fbs: "Šećeeer u krvi na prazan stomak",
+        fbs: "Šećer u krvi na prazan stomak",
         restecg: "EKG u mirovanju",
         thalach: "Maksimalni puls",
         exang: "Angina izazvana vježbom",
@@ -98,6 +98,7 @@ const translations = {
 };
 
 const languageSelect = document.getElementById("languageSelect");
+let currentLanguage = languageSelect.value;
 
 function updateLanguage(lang) {
     document.querySelectorAll("[data-i18n]").forEach(el => {
@@ -120,8 +121,10 @@ function updateLanguage(lang) {
     });
 }
 
-updateLanguage(languageSelect.value);
-languageSelect.addEventListener("change", () => updateLanguage(languageSelect.value));
+languageSelect.addEventListener("change", () => {
+    currentLanguage = languageSelect.value;
+    updateLanguage(currentLanguage);
+});
 
 const featureLabels = {
     bs: {
@@ -180,10 +183,9 @@ function getDisplayRisk(risk, decision) {
     return Math.round(risk * 100);
 }
 
-
 document.getElementById("predictBtn").addEventListener("click", async () => {
     const resultDiv = document.getElementById("result");
-    const lang = languageSelect.value;
+    const lang = currentLanguage;
 
     resultDiv.innerText = lang === "bs"
         ? "Procjena u toku..."
@@ -395,77 +397,10 @@ function detectRiskFactors(data, lang) {
 
     return factors;
 }
-/*
+
 document.getElementById("addBtn").addEventListener("click", async () => {
     const addResultDiv = document.getElementById("addResult");
-    const lang = languageSelect.value;
-
-    const data = {
-        age: document.getElementById("add_age").value,
-        sex: document.getElementById("add_sex").value,
-        cp: document.getElementById("add_cp").value,
-        trestbps: document.getElementById("add_trestbps").value,
-        chol: document.getElementById("add_chol").value,
-        fbs: document.getElementById("add_fbs").value,
-        restecg: document.getElementById("add_restecg").value,
-        thalch: document.getElementById("add_thalch").value,
-        exang: document.getElementById("add_exang").value,
-        oldpeak: document.getElementById("add_oldpeak").value,
-        slope: document.getElementById("add_slope").value,
-        ca: document.getElementById("add_ca").value,
-        thal: document.getElementById("add_thal").value
-    };
-
-    for (const key in data) {
-        if (data[key] === "" || data[key] === null || data[key] === undefined) {
-            addResultDiv.style.backgroundColor = "#ffcccc";
-            addResultDiv.innerText = lang === "bs"
-                ? "Molimo popunite sva polja prije dodavanja pacijenta."
-                : "Please fill in all fields before adding a patient.";
-            addResultDiv.classList.remove("hide");
-            return;
-        }
-    }
-
-    try {
-        const response = await fetch("http://127.0.0.1:5000/add", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
-        });
-
-        const result = await response.json();
-
-        if (result.status === "success") {
-            addResultDiv.style.backgroundColor = "#ccffcc";
-            addResultDiv.innerHTML = lang === "bs"
-                ? `
-            <strong>Pacijent uspješno dodan.</strong><br>
-            ⚠️ <em>Za ažuriranje predikcija potrebno je pokrenuti ponovno treniranje modela.</em>
-          `
-                : `
-            <strong>Patient successfully added.</strong><br>
-            ⚠️ <em>To update predictions, model retraining is required.</em>
-          `;
-        }
-        document.getElementById("retrainBtn").style.border = "2px solid orange";
-        document.getElementById("retrainBtn").scrollIntoView({ behavior: "smooth" });
-
-
-        addResultDiv.classList.remove("hide");
-
-
-    } catch (error) {
-        console.error(error);
-        addResultDiv.style.backgroundColor = "#ffcccc";
-        addResultDiv.innerText = lang === "bs" ? "Greška prilikom dodavanja pacijenta." : "Error adding patient.";
-        addResultDiv.classList.remove("hide");
-    }
-});
-*/
-document.getElementById("addBtn").addEventListener("click", async () => {
-    const addResultDiv = document.getElementById("addResult");
-    const lang = languageSelect.value;
+    const lang = currentLanguage;
 
     addResultDiv.classList.remove("hide");
     addResultDiv.style.opacity = 1;
@@ -535,10 +470,9 @@ document.getElementById("addBtn").addEventListener("click", async () => {
     }
 });
 
-
 document.getElementById("retrainBtn").addEventListener("click", async () => {
     const retrainDiv = document.getElementById("retrainResult");
-    const lang = languageSelect.value;
+    const lang = currentLanguage;
 
     retrainDiv.style.display = "block";
     retrainDiv.style.backgroundColor = "#fff3cd";
@@ -576,7 +510,6 @@ document.getElementById("retrainBtn").addEventListener("click", async () => {
                 : "Error – backend not reachable.";
     }
 });
-
 
 document.addEventListener("DOMContentLoaded", () => {
 

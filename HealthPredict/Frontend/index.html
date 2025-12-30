@@ -122,7 +122,7 @@
                 procjenu prokrvljenosti srčanog mišića.</small>
 
             <button id="predictBtn" data-i18n="predict_btn">Predvidi rizik</button>
-            <div class="result" id="result" data-i18n="rezultat">
+            <div class="result" id="result" data-i18n="rezultat" ata-ignore-i18n="true">
                 Ovdje će biti prikazan rezultat procjene rizika za srčane bolesti.
             </div>
         </div>
@@ -166,9 +166,9 @@
             <label data-i18n="restecg">EKG u mirovanju</label>
             <select id="add_restecg">
                 <option value="" disabled selected data-i18n="select">Odaberi</option>
-                <option value="normal">normalno</option>
-                <option value="lv hypertrophy">LV hipertrofija</option>
-                <option value="ST-T wave abnormality">ST-T valni poremećaj</option>
+                <option value="normal" data-i18n="normal">normalno</option>
+                <option value="lv hypertrophy" data-i18n="lv_hypertrophy">LV hipertrofija</option>
+                <option value="ST-T wave abnormality" data-i18n="stt">ST-T valni poremećaj</option>
             </select>
 
             <label data-i18n="thalach">Maksimalni puls</label>
@@ -218,7 +218,7 @@
                 procjenu prokrvljenosti srčanog mišića.</small>
 
             <button id="addBtn" data-i18n="add_patient_btn">Dodaj pacijenta</button>
-            <div class="result" id="addResult"></div>
+            <div class="result" id="addResult" data-ignore-i18n="true"></div>
         </div>
         
         <!-- RETRAIN CARD -->
@@ -226,7 +226,7 @@
             <h2 data-i18n="retrain_title">Retreniraj model</h2>
             <p data-i18n="retrain_text">Koristi novododate podatke za ponovno treniranje ML modela</p>
             <button id="retrainBtn" data-i18n="retrain_btn">Retreniraj model</button>
-            <div class="result" id="retrainResult"></div>
+            <div class="result" id="retrainResult" data-ignore-i18n="true"></div>
         </div>
     </div>
 
