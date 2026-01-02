@@ -19,7 +19,6 @@ def agent_loop():
 
         request_id, data = item
 
-        # ---- AGENT TICK ----
         percept = agent.sense(data)
         risk = agent.think(percept)
         decision = agent.act(risk, data)
