@@ -2,11 +2,18 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from threading import Thread
 
-from agent_runtime import add_request, get_result
+from agent_runtime import (
+    enqueue_predict,
+    enqueue_feedback,
+    enqueue_retrain,
+    get_result
+)
+
 from agent_runner import agent_loop
 
 from data_processing import load_data
 import pandas as pd
+
 
 app = Flask(__name__)
 CORS(app)
@@ -15,14 +22,15 @@ CORS(app)
 runner_thread = Thread(target=agent_loop, daemon=True)
 runner_thread.start()
 
-# ---------- ENDPOINTS ----------
+# ---------- PREDICT ----------
 @app.route("/predict", methods=["POST"])
 def predict_endpoint():
-    data = request.json
-    request_id = add_request(data)
+    data = request.json or {}
+    request_id = enqueue_predict(data)
     return jsonify({"request_id": request_id, "status": "queued"})
 
 
+# ---------- RESULT ----------
 @app.route("/result/<request_id>")
 def get_prediction_result(request_id):
     result = get_result(request_id)
@@ -30,10 +38,12 @@ def get_prediction_result(request_id):
         return jsonify({"status": "processing"})
     return jsonify(result)
 
+
+# ---------- ADD PATIENT ----------
 @app.route("/add", methods=["POST"])
 def add_data():
     try:
-        data = request.json
+        data = request.json or {}
 
         required_fields = [
             "age", "sex", "cp", "trestbps", "chol",
@@ -61,31 +71,35 @@ def add_data():
         return jsonify({"status": "success"})
 
     except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+# ---------- FEEDBACK ----------
+@app.route("/feedback", methods=["POST"])
+def feedback():
+    data = request.json or {}
+    request_id = data.get("request_id")
+    true_label = data.get("true_label")
+
+    if not request_id or true_label is None:
         return jsonify({
             "status": "error",
-            "message": str(e)
-        }), 500
+            "message": "request_id and true_label are required"
+        }), 400
+
+    enqueue_feedback(request_id, int(true_label))
+    return jsonify({"status": "success"})
 
 
+# ---------- RETRAIN ----------
 @app.route("/retrain", methods=["POST"])
-def retrain_model():
-    try:
-        import os
-        os.system("python train_model.py")
-
-        return jsonify({
-            "status": "success",
-            "message_bs": "Model je uspješno retreniran.",
-            "message_en": "Model retraining completed successfully."
-        })
-    except Exception as e:
-        return jsonify({
-            "status": "error",
-            "message_bs": "Greška prilikom retreniranja.",
-            "message_en": "Error during retraining."
-        }), 500
+def retrain():
+    job_id = enqueue_retrain()
+    return jsonify({
+        "status": "queued",
+        "job_id": job_id
+    })
 
 
-# ---------- RUN ----------
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False)

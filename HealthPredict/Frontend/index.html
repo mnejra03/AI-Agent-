@@ -122,9 +122,23 @@
                 procjenu prokrvljenosti srčanog mišića.</small>
 
             <button id="predictBtn" data-i18n="predict_btn">Predvidi rizik</button>
-            <div class="result" id="result" data-i18n="rezultat" ata-ignore-i18n="true">
-                Ovdje će biti prikazan rezultat procjene rizika za srčane bolesti.
+            <div class="result">
+                <div id="resultPlaceholder" data-i18n="rezultat">
+                    Ovdje će biti prikazan rezultat procjene rizika za srčane bolesti.
+                </div>
+                <div id="resultOutput"></div>
             </div>
+
+            <div id="feedbackBox" style="display:none; margin-top:12px;">
+                <p style="margin:0 0 8px 0;"><strong>Feedback (Learn):</strong></p>
+
+                <button id="feedbackYes" type="button">✅ Ima bolest</button>
+                <button id="feedbackNo" type="button">❎ Nema bolest</button>
+
+                <div id="feedbackMsg" style="margin-top:8px;"></div>
+            </div>
+
+
         </div>
 
         <!-- ADD DATA CARD -->
@@ -172,7 +186,7 @@
             </select>
 
             <label data-i18n="thalach">Maksimalni puls</label>
-            <input type="number" id="add_thalch" placeholder="60-120">
+            <input type="number" id="add_thalach" placeholder="60-120">
 
             <label data-i18n="exang">Angina izazvana vježbom</label>
             <select id="add_exang">
@@ -220,7 +234,7 @@
             <button id="addBtn" data-i18n="add_patient_btn">Dodaj pacijenta</button>
             <div class="result" id="addResult" data-ignore-i18n="true"></div>
         </div>
-        
+
         <!-- RETRAIN CARD -->
         <div class="card">
             <h2 data-i18n="retrain_title">Retreniraj model</h2>
