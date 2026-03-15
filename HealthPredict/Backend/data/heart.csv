@@ -945,4 +945,8 @@ id,age,sex,dataset,cp,trestbps,chol,fbs,restecg,thalch,exang,oldpeak,slope,ca,th
 944,19.0,0,new,typical angina,90.0,150.0,0,normal,71.0,0,0.0,flat,0.0,normal,0
 945,45.0,1,new,typical angina,100.0,150.0,1,normal,60.0,1,0.0,upsloping,0.0,normal,0
 946,70.0,0,new,atypical angina,130.0,300.0,0,ST-T wave abnormality,120.0,0,6.0,downsloping,3.0,reversable defect,0
-947,44,1,new,asymptomatic,101,151,1,lv hypertrophy,61,1,1,flat,1,fixed defect,0
+947,44.0,1,new,asymptomatic,101.0,151.0,1,lv hypertrophy,61.0,1,1.0,flat,1.0,fixed defect,0
+948,41.0,1,new,typical angina,111.0,151.0,1,normal,61.0,1,1.0,upsloping,1.0,normal,0
+949,42.0,1,new,asymptomatic,102.0,152.0,0,lv hypertrophy,62.0,0,2.0,flat,2.0,fixed defect,0
+950,66.0,0,new,typical angina,46.0,45.0,1,ST-T wave abnormality,52.0,0,3.0,flat,2.0,reversable defect,0
+951,12,1,new,typical angina,122,122,1,normal,122,1,2,upsloping,2,normal,0

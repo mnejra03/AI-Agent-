@@ -1,4 +1,3 @@
-console.log("✅ script.js loaded");
 const translations = {
     bs: {
         language_label: "Jezik:",
@@ -104,7 +103,7 @@ let currentLanguage = languageSelect.value;
 let lastRequestId = null;
 let lastInputData = null;
 
-/*
+
 function updateLanguage(lang) {
     document.querySelectorAll("[data-i18n]").forEach(el => {
         const key = el.getAttribute("data-i18n");
@@ -124,27 +123,6 @@ function updateLanguage(lang) {
             opt.innerText = translations[lang][key];
         }
     });
-}*/
-
-function updateLanguage(lang) {
-    document.querySelectorAll("[data-i18n]").forEach(el => {
-        // ✅ prvo provjeri ignore
-        if (el.dataset.ignoreI18n === "true") return;
-
-        const key = el.getAttribute("data-i18n");
-        if (!translations[lang][key]) return;
-
-        if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
-            el.placeholder = translations[lang][key];
-        } else {
-            el.innerText = translations[lang][key];
-        }
-    });
-
-    document.querySelectorAll("select option[data-i18n]").forEach(opt => {
-        const key = opt.getAttribute("data-i18n");
-        if (translations[lang][key]) opt.innerText = translations[lang][key];
-    });
 }
 
 languageSelect.addEventListener("change", () => {
@@ -157,7 +135,7 @@ const featureLabels = {
         num: null,
         id: null,
 
-        thalach: "Maksimalni puls",
+        thalch: "Maksimalni puls",
         "cp_atypical angina": "Atipična angina",
         "cp_typical angina": "Tipična angina",
         "cp_non-anginal": "Ne-anginalni bol u prsima",
@@ -172,7 +150,8 @@ const featureLabels = {
     en: {
         num: null,
         id: null,
-        thalach: "Maximum heart rate",
+
+        thalch: "Maximum heart rate",
         "cp_atypical angina": "Atypical angina",
         "cp_typical angina": "Typical angina",
         "cp_non-anginal": "Non-anginal chest pain",
@@ -198,16 +177,17 @@ const medicalExplanation = {
     }
 };
 
-/*
+function getDisplayRisk(decision, rawRisk) {
+  const p = Math.round(rawRisk * 100);
+  if (decision === "LOW_RISK") return Math.min(35, p);
+  if (decision === "REVIEW")   return Math.min(65, p);
+  if (decision === "HIGH_RISK")return Math.min(95, p);
+  return p;
+}
 async function runPrediction(data) {
     const lang = currentLanguage;
-    //const resultDiv = document.getElementById("result");
-    const resultDiv = document.getElementById("resultOutput");
-    const placeholder = document.getElementById("resultPlaceholder");
-    
+    const resultDiv = document.getElementById("result");
 
-  if (placeholder) placeholder.style.display = "none";
-  if (!resultDiv) throw new Error("resultOutput element missing");
     // 1) queue
     const response = await fetch("http://127.0.0.1:5000/predict", {
         method: "POST",
@@ -234,153 +214,48 @@ async function runPrediction(data) {
     }
 
     return result;
-}*/
-// ====================== SAFE DOM HELPERS ======================
-function $(id) {
-  const el = document.getElementById(id);
-  return el;
 }
-
-function must(id) {
-  const el = document.getElementById(id);
-  if (!el) throw new Error(`Missing element: #${id}`);
-  return el;
-}
-/*
-async function runPrediction(inputData) {
-  const lang = currentLanguage;
-  const resultDiv = document.getElementById("result");
-
-  // 1) POST /predict
-  const r1 = await fetch("http://127.0.0.1:5000/predict", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(inputData)
-  });
-
-  const queued = await r1.json();
-  const requestId = queued.request_id;
-
-  // zapamti za feedback
-  lastRequestId = requestId;
-  lastInputData = inputData;
-
-  // 2) polling /result/<id>
-  const start = Date.now();
-  const timeoutMs = 15000; // 15s
-
-  while (true) {
-    if (resultDiv) {
-      resultDiv.innerText = (lang === "bs")
-        ? `Agent obrađuje... (id: ${requestId.slice(0, 8)})`
-        : `Agent is processing... (id: ${requestId.slice(0, 8)})`;
-    }
-
-    await new Promise(r => setTimeout(r, 600));
-
-    const r2 = await fetch(`http://127.0.0.1:5000/result/${requestId}`, {
-      cache: "no-store"
-    });
-
-    const data = await r2.json();
-
-    // Ako backend još obrađuje:
-    if (data && data.status === "processing") {
-      if (Date.now() - start > timeoutMs) {
-        throw new Error("Timeout waiting for /result");
-      }
-      continue;
-    }
-
-    // ✅ Ovdje imamo rezultat (risk/decision/explanation)
-    return data;
-  }
-}*/
-
-
-// ====================== PREDICT HELPERS ======================
-async function runPrediction(data) {
-  const lang = currentLanguage;
-
-  // ✅ koristi ono što stvarno imaš u HTML-u
-  const resultDiv = document.getElementById("resultOutput");
-  const placeholder = document.getElementById("resultPlaceholder");
-
-  if (placeholder) placeholder.style.display = "none";
-  if (!resultDiv) throw new Error("Missing element: #resultOutput");
-
-  // 1) queue
-  const response = await fetch("http://127.0.0.1:5000/predict", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-    cache: "no-store"
-  });
-
-  const queued = await response.json();
-  const requestId = queued.request_id;
-
-  lastRequestId = requestId;
-  lastInputData = data;
-
-  resultDiv.innerText = lang === "bs" ? "Agent obrađuje podatke..." : "Agent is processing...";
-
-  // 2) polling
-  while (true) {
-    await new Promise(r => setTimeout(r, 700));
-
-    const res = await fetch(`http://127.0.0.1:5000/result/${requestId}`, { cache: "no-store" });
-    const resData = await res.json();
-
-    if (resData.status !== "processing") return resData;
-  }
-}
-
 document.getElementById("predictBtn").addEventListener("click", async () => {
-    console.log("✅ predict clicked");
-  const resultDiv = document.getElementById("resultOutput");
-  const lang = currentLanguage;
+    const resultDiv = document.getElementById("result");
+    const lang = currentLanguage;
 
-  if (!resultDiv) {
-    console.error("❌ Nema elementa #result u HTML-u");
-    return;
-  }
+    resultDiv.innerText = lang === "bs" ? "Procjena u toku..." : "Predicting...";
 
-  resultDiv.innerText = (lang === "bs") ? "Procjena u toku..." : "Predicting...";
-
-  const data = {
-    age: parseFloat(document.getElementById("age").value),
-    sex: parseInt(document.getElementById("sex").value),
-    cp: document.getElementById("cp").value,
-    trestbps: parseFloat(document.getElementById("trestbps").value),
-    chol: parseFloat(document.getElementById("chol").value),
-    fbs: parseInt(document.getElementById("fbs").value),
-    restecg: document.getElementById("restecg").value,
-    thalach: parseFloat(document.getElementById("thalach").value),
-    exang: parseInt(document.getElementById("exang").value),
-    oldpeak: parseFloat(document.getElementById("oldpeak").value),
-    slope: document.getElementById("slope").value,
-    ca: parseInt(document.getElementById("ca").value),
-    thal: document.getElementById("thal").value
-  };
-
-  try {
-    const result = await runPrediction(data);
-
-    const decisionLabels = {
-      LOW_RISK: lang === "bs" ? "NIZAK RIZIK" : "LOW RISK",
-      REVIEW:   lang === "bs" ? "SREDNJI RIZIK" : "MODERATE RISK",
-      HIGH_RISK:lang === "bs" ? "VISOK RIZIK" : "HIGH RISK"
+    const data = {
+        age: parseFloat(document.getElementById("age").value),
+        sex: parseInt(document.getElementById("sex").value),
+        cp: document.getElementById("cp").value,
+        trestbps: parseFloat(document.getElementById("trestbps").value),
+        chol: parseFloat(document.getElementById("chol").value),
+        fbs: parseInt(document.getElementById("fbs").value),
+        restecg: document.getElementById("restecg").value,
+        thalch: parseFloat(document.getElementById("thalach").value),
+        exang: parseInt(document.getElementById("exang").value),
+        oldpeak: parseFloat(document.getElementById("oldpeak").value),
+        slope: document.getElementById("slope").value,
+        ca: parseInt(document.getElementById("ca").value),
+        thal: document.getElementById("thal").value
     };
 
-    const riskPercent = getDisplayRisk(result.risk, result.decision);
-    const riskFactors = detectRiskFactors(data, lang);
+    try {
+        const result = await runPrediction(data);
 
-    let clinicalColor = "#16a34a";              // green
-    if (result.decision === "HIGH_RISK") clinicalColor = "#dc2626"; // red
-    if (result.decision === "REVIEW")    clinicalColor = "#6d28d9"; // purple
+        const decisionLabels = {
+            LOW_RISK: lang === "bs" ? "NIZAK RIZIK" : "LOW RISK",
+            REVIEW: lang === "bs" ? "SREDNJI RIZIK" : "MODERATE RISK",
+            HIGH_RISK: lang === "bs" ? "VISOK RIZIK" : "HIGH RISK"
+        };
 
-    resultDiv.innerHTML = `
+        // NOTE: ovdje je bila tvoja greška — ispravno je (decision, risk)
+        const riskPercent = getDisplayRisk(result.decision, result.risk);
+        const riskFactors = detectRiskFactors(data, lang);
+
+        // ljepše boje (bez žute)
+        let clinicalColor = "#16a34a";       // green
+        if (result.decision === "HIGH_RISK") clinicalColor = "#dc2626"; // red
+        if (result.decision === "REVIEW") clinicalColor = "#6d28d9"; // purple
+
+        resultDiv.innerHTML = `
       <h3>🩺 ${lang === "bs" ? "Procjena rizika" : "Risk Assessment"}</h3>
 
       <p><strong>${lang === "bs" ? "Klinička odluka agenta:" : "Agent clinical decision:"}</strong></p>
@@ -408,11 +283,10 @@ document.getElementById("predictBtn").addEventListener("click", async () => {
       </div>
 
       <small style="display:block;margin-top:8px;color:#555;">
-        ℹ️ ${
-          lang === "bs"
-            ? "Klinički rizik se određuje kombinacijom medicinskih pravila i modela, dok procenat predstavlja statističku vjerovatnoću."
-            : "Clinical risk is determined using a combination of medical rules and the model, while the percentage represents statistical probability."
-        }
+        ℹ️ ${lang === "bs"
+                ? "Klinički rizik se određuje kombinacijom medicinskih pravila i modela, dok procenat predstavlja statističku vjerovatnoću."
+                : "Clinical risk is determined using a combination of medical rules and the model, while the percentage represents statistical probability."
+            }
       </small>
 
       <p style="margin-top:12px; font-style:italic;">
@@ -420,18 +294,16 @@ document.getElementById("predictBtn").addEventListener("click", async () => {
       </p>
     `;
 
-    // prikazi feedback tek nakon predikcije
-    const box = document.getElementById("feedbackBox");
-    const msg = document.getElementById("feedbackMsg");
-    if (box) box.style.display = "block";
-    if (msg) msg.innerText = "";
+        // Feedback UI prikazuj tek nakon predikcije
+        document.getElementById("feedbackBox").style.display = "block";
+        document.getElementById("feedbackMsg").innerText = "";
 
-  } catch (e) {
-    console.error(e);
-    resultDiv.innerText = (lang === "bs")
-      ? "Greška u komunikaciji s agentom."
-      : "Agent communication error.";
-  }
+    } catch (e) {
+        console.error(e);
+        resultDiv.innerText = lang === "bs"
+            ? "Greška u komunikaciji s agentom."
+            : "Agent communication error.";
+    }
 });
 
 
@@ -482,24 +354,17 @@ function getMedicalComment(decision, factors, lang) {
 
     return baseText;
 }
-/*function getDisplayRisk(decision, rawRisk) {
-  const p = Math.round(rawRisk * 100);
 
-  if (decision === "LOW_RISK") return Math.min(35, Math.max(10, p));
-  if (decision === "REVIEW")   return Math.min(65, Math.max(40, p));
-  if (decision === "HIGH_RISK")return Math.min(95, Math.max(70, p));
+function getDisplayRisk(decision, rawRisk) {
+    const p = Math.round(rawRisk * 100);
 
-  return p;
-}*/
-function getDisplayRisk(rawRisk, decision) {
-  const p = Math.round(Number(rawRisk) * 100);
+    if (decision === "LOW_RISK") return Math.min(35, Math.max(10, p));
+    if (decision === "REVIEW") return Math.min(65, Math.max(40, p));
+    if (decision === "HIGH_RISK") return Math.min(95, Math.max(70, p));
 
-  if (decision === "LOW_RISK") return Math.min(35, Math.max(10, p));
-  if (decision === "REVIEW")   return Math.min(65, Math.max(40, p));
-  if (decision === "HIGH_RISK")return Math.min(95, Math.max(70, p));
-
-  return p;
+    return p;
 }
+
 
 function detectRiskFactors(data, lang) {
     const factors = [];
@@ -545,7 +410,7 @@ document.getElementById("addBtn").addEventListener("click", async () => {
         chol: document.getElementById("add_chol").value,
         fbs: document.getElementById("add_fbs").value,
         restecg: document.getElementById("add_restecg").value,
-        thalach: document.getElementById("add_thalach").value,
+        thalch: document.getElementById("add_thalch").value,
         exang: document.getElementById("add_exang").value,
         oldpeak: document.getElementById("add_oldpeak").value,
         slope: document.getElementById("add_slope").value,
@@ -608,31 +473,68 @@ document.getElementById("retrainBtn").addEventListener("click", async () => {
     retrainDiv.style.backgroundColor = "#fff3cd";
     retrainDiv.innerText =
         lang === "bs"
-            ? "Ponovno treniranje modela, molimo sačekajte..."
-            : "Retraining model, please wait...";
+            ? "Retreniranje je stavljeno u red (queue)..."
+            : "Retraining queued...";
 
     try {
-        const response = await fetch("http://127.0.0.1:5000/retrain", {
-            method: "POST"
-        });
+        // 1) Queue retrain
+        const response = await fetch("http://127.0.0.1:5000/retrain", { method: "POST" });
+        const queued = await response.json();
 
-        const result = await response.json();
+        if (!response.ok || queued.status !== "queued" || !queued.job_id) {
+            retrainDiv.style.backgroundColor = "#ffcccc";
+            retrainDiv.innerText =
+                lang === "bs"
+                    ? "Greška: retreniranje nije uspješno stavljeno u red."
+                    : "Error: retraining was not queued.";
+            return;
+        }
 
-        if (result.status === "success") {
+        const jobId = queued.job_id;
+
+        // 2) Poll until success/error (treat queued as still running)
+        let final = null;
+
+        while (!final) {
+            await new Promise(r => setTimeout(r, 1000));
+            const res = await fetch(`http://127.0.0.1:5000/retrain_result/${jobId}`);
+            const data = await res.json();
+
+            // update "in progress" text nicely
+            if (data.status === "queued" || data.status === "processing") {
+                retrainDiv.style.backgroundColor = "#fff3cd";
+                retrainDiv.innerText =
+                    lang === "bs"
+                        ? "Retreniranje u toku..."
+                        : "Retraining in progress...";
+                continue;
+            }
+
+            // finish only on success or error
+            if (data.status === "success" || data.status === "error") {
+                final = data;
+            } else {
+                // unknown status -> keep waiting
+                continue;
+            }
+        }
+
+        // 3) Show final
+        if (final.status === "success") {
             retrainDiv.style.backgroundColor = "#ccffcc";
             retrainDiv.innerText =
                 lang === "bs"
-                    ? result.message_bs
-                    : result.message_en;
+                    ? (final.message_bs || "Model je uspješno retreniran.")
+                    : (final.message_en || "Model retrained successfully.");
         } else {
             retrainDiv.style.backgroundColor = "#ffcccc";
             retrainDiv.innerText =
                 lang === "bs"
-                    ? "Greška prilikom retreniranja."
-                    : "Retraining failed.";
+                    ? (final.message_bs || ("Greška prilikom retreniranja." + (final.details ? `\n${final.details}` : "")))
+                    : (final.message_en || ("Retraining failed." + (final.details ? `\n${final.details}` : "")));
         }
-
     } catch (error) {
+        console.error(error);
         retrainDiv.style.backgroundColor = "#ffcccc";
         retrainDiv.innerText =
             lang === "bs"
@@ -640,7 +542,6 @@ document.getElementById("retrainBtn").addEventListener("click", async () => {
                 : "Error – backend not reachable.";
     }
 });
-/*
 document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("age").value = 61;
@@ -656,13 +557,14 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("slope").value = "downsloping";
     document.getElementById("ca").value = 3;
     document.getElementById("thal").value = "reversable defect";
-});*/
- 
 
-/*
+    
+});
 async function sendFeedback(trueLabel) {
     const lang = currentLanguage;
     const msg = document.getElementById("feedbackMsg");
+
+    if (!msg) return;
 
     if (!lastRequestId || !lastInputData) {
         msg.innerText = lang === "bs"
@@ -685,87 +587,28 @@ async function sendFeedback(trueLabel) {
 
         const data = await res.json();
 
-        // backend ti vraća {"status":"ok"}
-        if (!res.ok || data.status !== "ok") {
-            msg.innerText = (lang === "bs" ? "Greška: " : "Error: ") + (data.message || "unknown");
+        if (!res.ok || data.status !== "success") {
+            msg.innerText =
+                (lang === "bs" ? "Greška: " : "Error: ") +
+                (data.message || "unknown");
             return;
         }
 
-        msg.innerHTML = lang === "bs"
-            ? "✅ Feedback spremljen. Agent je ažurirao policy (Learn).<br><em>Ponovo računam predikciju sa istim unosom...</em>"
-            : "✅ Feedback saved. Agent updated its policy (Learn).<br><em>Re-running prediction with the same input...</em>";
-
-        // AUTOMATSKI DOKAZ LEARN: isti input -> novi output
-        const newResult = await runPrediction(lastInputData);
-
-        const oldText = lang === "bs" ? "Novi rezultat" : "New result";
-        msg.innerHTML += `<br><strong>${oldText}:</strong> ${(newResult.risk * 100).toFixed(1)}% (${newResult.decision})`;
+        // samo potvrda feedbacka
+        msg.innerText =
+            lang === "bs"
+                ? "✅ Feedback spremljen. Agent će koristiti ovu informaciju za buduće procjene."
+                : "✅ Feedback saved. The agent will use this information for future predictions.";
 
     } catch (e) {
         console.error(e);
-        msg.innerText = lang === "bs" ? "Greška pri slanju feedbacka." : "Failed to send feedback.";
+        msg.innerText =
+            lang === "bs"
+                ? "Greška pri slanju feedbacka."
+                : "Failed to send feedback.";
     }
 }
-*/
-// ====================== FEEDBACK ======================
-async function sendFeedback(trueLabel) {
-  const lang = currentLanguage;
 
-  const msg = $("feedbackMsg");       // može biti null, zato guard
-  const box = $("feedbackBox");
+document.getElementById("feedbackYes").addEventListener("click", () => sendFeedback(1));
+document.getElementById("feedbackNo").addEventListener("click", () => sendFeedback(0));
 
-  if (!lastRequestId || !lastInputData) {
-    if (msg) msg.innerText = lang === "bs"
-      ? "Prvo uradite predikciju pa tek onda feedback."
-      : "Run a prediction first, then send feedback.";
-    return;
-  }
-
-  if (msg) msg.innerText = lang === "bs" ? "Šaljem feedback..." : "Sending feedback...";
-
-  try {
-    const res = await fetch("http://127.0.0.1:5000/feedback", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ request_id: lastRequestId, true_label: trueLabel }),
-      cache: "no-store"
-    });
-
-    const data = await res.json();
-
-    if (!res.ok || data.status !== "success") {
-      if (msg) msg.innerText = (lang === "bs" ? "Greška: " : "Error: ") + (data.message || "unknown");
-      return;
-    }
-
-    if (msg) {
-      msg.innerHTML = lang === "bs"
-        ? "✅ Feedback spremljen. <em>Ponovo računam predikciju sa istim unosom...</em>"
-        : "✅ Feedback saved. <em>Re-running prediction with the same input...</em>";
-    }
-
-    // dokaz learn: isti input -> novi output
-    const newResult = await runPrediction(lastInputData);
-
-    const riskPercent = getDisplayRisk(newResult.risk, newResult.decision);
-
-    if (msg) {
-      msg.innerHTML += lang === "bs"
-        ? `<br><strong>Novi rezultat:</strong> ${riskPercent}% (${newResult.decision})`
-        : `<br><strong>New result:</strong> ${riskPercent}% (${newResult.decision})`;
-    }
-
-    // ako postoji box, ostavi ga vidljivim
-    if (box) box.style.display = "block";
-
-  } catch (e) {
-    console.error(e);
-    if (msg) msg.innerText = lang === "bs" ? "Greška pri slanju feedbacka." : "Failed to send feedback.";
-  }
-}
-
-const fbYes = document.getElementById("feedbackYes");
-const fbNo = document.getElementById("feedbackNo");
-
-if (fbYes) fbYes.addEventListener("click", () => sendFeedback(1));
-if (fbNo) fbNo.addEventListener("click", () => sendFeedback(0));
